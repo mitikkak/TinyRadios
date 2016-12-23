@@ -1,21 +1,29 @@
 
 #ifndef __AVR_ATtiny85__
-#error board not supported!
+//#error board not supported!
 #endif
 
 #include "RF24.h"
-#include <Messages.h>
+#include "Messages.h"
+#ifndef __AVR_ATtiny85__
+#define _SERIAL Serial
+#else
 #include <TinyDebugSerial.h>
 TinyDebugSerial mySerial = TinyDebugSerial();
+#define _SERIAL mySerial
+#endif
 
 #define CE_PIN 9
+#ifdef __AVR_ATtiny85__
 #define CSN_PIN 9
+#else
+#define CSN_PIN 10
+#endif
 RF24 radio(CE_PIN,CSN_PIN);
 /**********************************************************/
 byte switch_address[7] = "Switch";
 byte my_address[7] = "Remote";
 
-#define _SERIAL mySerial
 
 const int switchPin = 4;
 void setup() {
@@ -32,15 +40,20 @@ void setup() {
 }
 
 TIME timePrev = 0;
+int prevState = 0xFFFF;
 void loop() 
 {
   TIME const timeNow = millis();
-  if (timeNow - timePrev < 1000) { return; }
+  if (timeNow - timePrev < 10) { return; }
   timePrev= timeNow;
   int const switchState = digitalRead(switchPin);
-  _SERIAL.print("switch: "); _SERIAL.println(switchState);
+  if (switchState != prevState)
+  {
+    prevState = switchState;
+    _SERIAL.print("switch: "); _SERIAL.println(switchState);
+  }
   SwitchRequest request(SWITCH_REQUEST);
-  request.set(switchState);
+  request.set(switchState);  
   radio.write( &request, sizeof(request) ); 
 }
 

@@ -5,7 +5,14 @@
 
 #include "RF24.h"
 #include <Messages.h>
-#include "MySerial.h"
+
+#ifdef __AVR_ATtiny85__
+#include <TinyDebugSerial.h>
+TinyDebugSerial mySerial = TinyDebugSerial();
+#define _SERIAL mySerial
+#else
+#define _SERIAL Serial
+#endif
 
 #define CE_PIN 9
 #ifdef __AVR_ATtiny85__
@@ -40,6 +47,7 @@ int nextState = LOW;
 void loop() 
 {
   bool timeout = false;
+  #if 1
   TIME const started_waiting_at = micros();
   while ( !radio.available() ){ // While nothing is received
     if (micros() - started_waiting_at > 20000 ){ // If waited longer than 200ms, indicate timeout and exit while loop
@@ -51,21 +59,26 @@ void loop()
 
   }
   if (!timeout)
+  #else
+  if (radio.available())
+  #endif
   {
     SwitchRequest request(0);
     radio.read( &request, sizeof(request) );
-    msgs++;
     if (request.header.msgId == SWITCH_REQUEST)
     {
+      msgs++;
       nextState = (request.state == SwitchRequest::SWITCH_ON) ? HIGH : LOW;
-      _SERIAL.print("new state: "); _SERIAL.println(nextState);
+      
     }
   }
   digitalWrite(switchPin, nextState);
-  if (millis() - prevLog >= 1000)
+  if (millis() - prevLog >= 5000)
   {
     prevLog = millis();
-     _SERIAL.print(timeOuts); _SERIAL.print("/"); _SERIAL.println(msgs);
+    _SERIAL.print(prevLog);
+    _SERIAL.print(", new state: "); _SERIAL.print(nextState);
+    _SERIAL.print("/");_SERIAL.print(timeOuts);_SERIAL.print("/"); _SERIAL.println(msgs);
   }
 }
 
