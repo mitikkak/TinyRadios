@@ -15,12 +15,14 @@
 #ifdef AT_TINY_84
 #include <TinyDebugSerial.h>
 TinyDebugSerial mySerial = TinyDebugSerial();
+#else
+#define _SERIAL Serial
 #endif
 
 /* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
 #ifdef ATMEGA328
-#define CE_PIN 10
-#define CSN_PIN 9
+#define CE_PIN 9
+#define CSN_PIN 10
 #else
 #define CE_PIN 8
 #define CSN_PIN 7
@@ -36,6 +38,8 @@ int const buttonPin = 4;
 ADXL345 acc;
 
 void setup() {
+  _SERIAL.begin(9600);
+  _SERIAL.println("Start-up");
   acc.begin();
   acc.setRange(ADXL345::RANGE_4G);
   int const beginStatus = radio.begin(); // Start up the radio
@@ -69,21 +73,48 @@ struct FailureSnooper
   void timeout()
   {
     tOut = true;
+    tOutC++;
   }
   void wrongResponse()
   {
     wResp = true;
+    wRespC++;
+  }
+  void okResponse()
+  {
+    okRespC++;
   }
   void wrongTransaction()
   {
     wTrId = true;
+    wTrIdC++;
   }
   bool sawProblems()
   {
     return ((tOut == true) || (wResp == true) || (wTrId == true));
   }
   bool tOut, wResp, wTrId;
+  static int tOutC, wRespC, okRespC, wTrIdC;
+  static TIME prevReport;
+
+  static void log()
+  {
+    if (millis() - FailureSnooper::prevReport > 5000)
+    {
+      prevReport =  millis();
+      _SERIAL.print(prevReport);
+      _SERIAL.print(", tOutC:");_SERIAL.print(tOutC);
+      _SERIAL.print(", okRespC:");_SERIAL.print(okRespC);
+      _SERIAL.print(", wRespC:");_SERIAL.print(wRespC);
+      _SERIAL.print(", wTrIdC:");_SERIAL.println(wTrIdC);
+    }
+  }
 };
+int FailureSnooper::tOutC = 0;
+int FailureSnooper::wRespC = 0;
+int FailureSnooper::okRespC = 0;
+int FailureSnooper::wTrIdC = 0;
+TIME FailureSnooper::prevReport = 0;
 
 void reportProblem()
 {
@@ -121,7 +152,7 @@ bool idleSomeMore()
   return (timeNow - prevActionAt < idleThreshold) ? true : false;
 }
 void loop() {
-  if (idleSomeMore()) return;
+  //if (idleSomeMore()) return;
   const int button = digitalRead(buttonPin);
   TiltValues tilt = getTiltValues();
   sendTiltRequest(tilt, button);
@@ -144,6 +175,10 @@ void loop() {
     {
       snooper.wrongResponse(); 
     }
+    else
+    {
+      snooper.okResponse();
+    }
     if (response.header.transactionId != tiltRequest.header.transactionId)
     {
       snooper.wrongTransaction(); 
@@ -157,5 +192,6 @@ void loop() {
   {
     clearProblem();
   }
+  FailureSnooper::log();
 }
 

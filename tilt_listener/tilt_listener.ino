@@ -10,7 +10,7 @@
 #endif
 #include "RF24.h"
 #include "Messages.h"
-#include "JeeLib.h"
+//#include "JeeLib.h"
 
 #define DEBUGGING
 
@@ -25,6 +25,10 @@ TinyDebugSerial mySerial = TinyDebugSerial();
 #endif
 
 #include "DualMotors.h"
+
+#if defined __AVR_ATtiny85__
+#define RADIO_ONLY
+#endif
 
 /* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
 #if defined __AVR_ATtiny85__
@@ -47,6 +51,7 @@ struct Tracer
   const char* name;
   int failed_writes;
   int wrong_message;
+  int ok_message;
   int pitch;
   int roll;
   int button;
@@ -54,6 +59,7 @@ struct Tracer
   Tracer(const char* n): 
    name(n),
    failed_writes(0),
+   ok_message(0),
    wrong_message(0),
    pitch(0),
    roll(0),
@@ -66,6 +72,8 @@ struct Tracer
         _SERIAL.print(name);
         _SERIAL.print(F(", time:"));
         _SERIAL.print(timeNow);
+        _SERIAL.print(F(", ok:"));
+        _SERIAL.print(ok_message);
         _SERIAL.print(F(", failed writes: "));
         _SERIAL.print(failed_writes);
         _SERIAL.print(F(", timeouts: "));
@@ -88,9 +96,11 @@ struct Tracer
 #define MO_L_E_PIN 6
 #define MO_L_P1_PIN 8
 #define MO_L_P2_PIN 7
+#ifndef RADIO_ONLY
 Motor motorLeft("Left", MO_L_E_PIN, MO_L_P1_PIN, MO_L_P2_PIN);
 Motor motorRight("Right", MO_R_E_PIN, MO_R_P1_PIN, MO_R_P2_PIN);
 DualMotors motors(motorLeft, motorRight);
+#endif
 
 void setup() {
   #ifdef DEBUGGING
@@ -107,9 +117,11 @@ void setup() {
   // Start the radio listening for data
   radio.openReadingPipe(1,my_address);
   radio.openWritingPipe(remote_address);
+  #ifndef RADIO_ONLY
   motors.init();
   pinMode(headLights, OUTPUT);
   digitalWrite(headLights, LOW);
+  #endif
 }
 
 void write_response(Tracer& tracer, int transactionId)
@@ -127,6 +139,10 @@ int read_request(Tracer& tracer)
         if (request.header.msgId != TILT_REQUEST)
         {
           tracer.wrong_message++;
+        }
+        else
+        {
+          tracer.ok_message++;
         }
         tracer.pitch = request.tilt.pitch;
         tracer.roll = request.tilt.roll;
@@ -161,24 +177,28 @@ bool communicateWithNode(const int respMsgId, Tracer& tracer)
     return retValue;
 }
 
-ISR(WDT_vect) { Sleepy::watchdogEvent(); } 
+//ISR(WDT_vect) { Sleepy::watchdogEvent(); } 
 
 TIME timePrevMsgServed = 0;
 TIME timePrevAliveLogged = 0;
+TIME timePrevLogged = 0;
 const TIME communicationBreakdownThreshold = 300;
 const TIME activationThreshold = 1000;
 const TIME deactivationThreshold = 1000;
 const int PWR_SAVE_OFF = 0;
 const int PWR_SAVE_ON = 1;
 int powerSaveMode = PWR_SAVE_OFF;
+Tracer tiltTracer("TILT");
 
 void loop() {
+    #ifndef RADIO_ONLY
     motorLeft.loggingOff();
     motorRight.loggingOff();
+    #endif
     TIME const timeNow = millis();
     if (powerSaveMode == PWR_SAVE_OFF)
     {
-      Tracer tiltTracer("TILT");
+      
       bool const msgReceived = communicateWithNode(TILT_RESPONSE, tiltTracer);
       //tiltTracer.log(timeNow);
   
@@ -195,22 +215,35 @@ void loop() {
         _SERIAL.print(" ");
         _SERIAL.println(leftWise);
         #endif
+          #ifndef RADIO_ONLY
           motorLeft.loggingOn();
           motorRight.loggingOn();
           digitalWrite(headLights, HIGH);
+          #endif
         }
         else
         {
+            #ifndef RADIO_ONLY
           digitalWrite(headLights, LOW);
+          #endif
         }
         #endif
+          #ifndef RADIO_ONLY
         motors.go(forwardWise, leftWise);
+        #endif
         // MotorControlOrders orders(forwardWise, leftWise);
         //motors.go(orders);
       }
+        #ifndef RADIO_ONLY
       if (timeNow - timePrevMsgServed > communicationBreakdownThreshold)
       {
        motors.stop();
+      }
+      #endif
+      if (timeNow - timePrevLogged > 5000)
+      {
+         timePrevLogged = timeNow;
+         tiltTracer.log(timeNow);
       }
     }
     #if 0
