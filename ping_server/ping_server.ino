@@ -23,9 +23,19 @@ TinyDebugSerial mySerial = TinyDebugSerial();
 RF24 radio(CE_PIN,CSN_PIN);
 /**********************************************************/
 byte remote_address[8] = "p_client";
-byte my_address[5] = {0xAB, 0xBA, 0xAC, 0xDC, 0x1};
+byte my_address[5] = {0xAB, 0xBA, 0xAC, 0xDC, 0x4};
 
 const int ledPin = 4;
+void doBlink(const int rounds, const int delay_)
+{
+  for (int r = 0; r < rounds; r++)
+  {
+    digitalWrite(ledPin, HIGH);
+    delay(delay_);
+    digitalWrite(ledPin, LOW);
+    delay(delay_);
+  }
+}
 void setup() {
   _SERIAL.begin(9600);
   _SERIAL.println("begin");
@@ -38,6 +48,7 @@ void setup() {
   //radio.setPALevel(RF24_PA_LOW);
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
+  doBlink(3, 300);
 }
 
 TIME prevLog = 0;
@@ -80,6 +91,8 @@ Ping getPingRequest()
 
 
 TIME timePrev = 0;
+bool connectionEstablished = false;
+TIME const CONNECTION_WAIT_PERIOD = 30000;
 void loop() 
 {
   #if 0
@@ -90,12 +103,17 @@ void loop()
   Ping const req = getPingRequest();
   if (req.header.msgId == PING_REQUEST)
   {
+    if (!connectionEstablished)
+    {
+      doBlink(3, 300);
+    }
+    connectionEstablished = true;
     digitalWrite(ledPin, HIGH);
     reqs++;
     sendPingResponse(req);
   }
   
-  if (millis() - prevLog >= 5000)
+  if (millis() - prevLog >= CONNECTION_WAIT_PERIOD)
   {
     prevLog = millis();
     _SERIAL.print(prevLog);
@@ -103,7 +121,8 @@ void loop()
     _SERIAL.print(", timeouts: "); _SERIAL.println(timeouts);
     if (!reqs)
     {
-      digitalWrite(ledPin, LOW);
+      connectionEstablished = false;
+      digitalWrite(ledPin, HIGH);
     }
     reqs = 0;
     timeouts = 0;
