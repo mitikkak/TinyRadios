@@ -23,7 +23,11 @@ TinyDebugSerial mySerial = TinyDebugSerial();
 RF24 radio(CE_PIN,CSN_PIN);
 /**********************************************************/
 //byte remote_address[8] = {0xAA, 0xAA, 0xBB, 0xBB, 0xCC, 0xCC, 0xDD, 0xDD};
-byte remote_address[5] = {0xAB, 0xBA, 0xAC, 0xDC, 0x1};
+byte remote_address[3][5] = {
+  {0xAB, 0xBA, 0xAC, 0xDC, 0x1},
+  {0xAB, 0xBA, 0xAC, 0xDC, 0x2},
+  {0xAB, 0xBA, 0xAC, 0xDC, 0x3}
+};
 byte my_address[8] = "p_client";
 
 void setup() {
@@ -33,7 +37,6 @@ void setup() {
   
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15,15); // Max delay between retries & number of retries
-  radio.openWritingPipe(remote_address); // Write to device address '2Node'
   radio.openReadingPipe(1,my_address); // Read on pipe 1 for device address '1Node'
   radio.setPALevel(RF24_PA_LOW);
 }
@@ -67,14 +70,15 @@ Ping getPingResponse()
 }
 
 const unsigned int MAX_ATTEMPTS = 10;
-Ping onePingRound(unsigned int const rounds, TIME& timeSpent, unsigned int& attempts)
+Ping onePingRound(uint32_t const receiver, unsigned int const rounds, TIME& timeSpent, unsigned int& attempts)
 {
+  radio.openWritingPipe(remote_address[receiver]); // Write to device address '2Node'
   TIME const timeStart = millis();
   do
   {
     attempts++;
     sendPingRequest(rounds);
-    #if 1
+    #if 0
     Ping const resp = getPingResponse();
     if (resp.header.msgId == PING_RESPONSE)
     {
@@ -109,7 +113,9 @@ void loop()
   #endif
   TIME timeSpent = -1;
   unsigned int attempts = 0;
-  Ping const resp = onePingRound(stats.rounds, timeSpent, attempts);
+  Ping const resp = onePingRound(0, stats.rounds, timeSpent, attempts);
+  Ping const resp2 = onePingRound(1, stats.rounds, timeSpent, attempts);
+  Ping const resp3 = onePingRound(2, stats.rounds, timeSpent, attempts);
   
 
   if (attempts < MAX_ATTEMPTS && timeSpent != -1)
