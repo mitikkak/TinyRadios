@@ -1,7 +1,6 @@
 
-#include "Arduino.h"
+#include "Components.h"
 
-const int ledPin = 4;
 void setup() {
   pinMode(ledPin, OUTPUT);
 }

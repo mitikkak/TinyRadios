@@ -1,6 +1,5 @@
 
-#include "Arduino.h"
-const int ledPin = 4;
+#include "Components.h"
 
 // the loop function runs over and over again forever
 void loop() {
