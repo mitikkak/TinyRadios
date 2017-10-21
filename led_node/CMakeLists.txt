@@ -25,6 +25,8 @@ set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${SRC_DIR} ${ARDUINO_WIRE_SRC} /home/mikko/.arduino15/packages/attiny/hardware/avr/1.0.2/variants/tiny8)
 
 add_definitions(-c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=attiny85 -DF_CPU=8000000L -DARDUINO=10612 -DARDUINO_attiny -DARDUINO_ARCH_AVR)
+set(node_number 1 CACHE STRING "node number of led node")
+add_definitions(-Dnode_number=${node_number})
 #add_definitions(-c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10800 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR)
 
 set(sources ${SRC_DIR}/Loop.cpp ${SRC_DIR}/Setup.cpp)
@@ -83,4 +85,10 @@ add_custom_target(bootloader COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avrd
 add_custom_target(elf_to_hex COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avr-objcopy -O ihex -R .eeprom led_node led_node.hex)
 add_custom_target(upload COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avrdude -C${ARDUINO_PATH}/hardware/tools/avr/etc/avrdude.conf -v -pattiny85 -cstk500v1 -P/dev/ttyACM0 -b19200 -Uflash:w:./led_node.hex:i
                          DEPENDS elf_to_hex)
+
+add_custom_target(usage COMMAND echo "USAGE:"
+                        COMMAND echo "cmake -Dnode_number:STRING=[integer] ../"
+                        COMMAND echo "make led_node"
+                        COMMAND echo "make bootloader"
+                        COMMAND echo "make upload")
 
