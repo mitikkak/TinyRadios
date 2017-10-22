@@ -72,7 +72,8 @@ set(arduino_core_sources ${ARDUINO_CORE_SRC}/CDC.cpp
                          ${ARDUINO_CORE_SRC}/wiring_pulse.c
                          ${ARDUINO_CORE_SRC}/wiring_shift.c
 )
-set(tiny_dbg_serial_sources ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial.cpp)
+set(tiny_dbg_serial_sources ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial.cpp
+                            ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial9600.cpp)
 set(rf24_sources ${RF24_SRC}/RF24.cpp)
 
 # Find Arduino SDK delivered programs
