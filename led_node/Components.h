@@ -13,6 +13,11 @@ const int ledPin = 4;
 #define CE_PIN 9
 #define CSN_PIN CE_PIN
 
+#ifndef node_number
+    #error "node_number not available! Check your build system."
+#endif
+
+static constexpr char node_id{node_number};
 const byte remote_address[5] = {0xAA, 0xBB, 0xCC, 0xDD, 0x0};
-const byte my_address[5] = {0xAA, 0xBB, 0xCC, 0xDD, 0x1};
+const byte my_address[5] = {0xAA, 0xBB, 0xCC, 0xDD, node_id};
 

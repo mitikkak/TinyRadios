@@ -29,24 +29,44 @@ else()
    message(FATAL_ERROR "ARDUINO_LIB_PATH environment variable missing! It should point to your arduino library root, for example /home/your_name/Arduino/libraries/")
 endif()
 
+message(TINY_PKG_PATH: ${TINY_PKG_PATH})
+if(${TINY_PKG_PATH} MATCHES .*attiny.*)
+   message("tiny package path found at:" ${TINY_PKG_PATH})
+else()
+   message("setting tiny package path from env variable ...")
+   set(TINY_PKG_PATH $ENV{TINY_PKG_PATH} CACHE STRING "")
+endif()
+
+if(${TINY_PKG_PATH} MATCHES .*attiny.*)
+   message("tiny package path found at:" ${TINY_PKG_PATH})
+else()
+   message(FATAL_ERROR "TINY_PKG_PATH environment variable missing! It should point to your attiny package root, for example /home/your_name/.arduino15/packages/attiny/")
+endif()
+
 set(AVR_COMPILER_DIR ${ARDUINO_PATH}/hardware/tools/avr/bin)
 set(CMAKE_C_COMPILER ${AVR_COMPILER_DIR}/avr-gcc)
 set(CMAKE_CXX_COMPILER ${AVR_COMPILER_DIR}/avr-g++)
 set(ARDUINO_CORE_SRC ${ARDUINO_PATH}/hardware/arduino/avr/cores/arduino)
 set(ARDUINO_WIRE_SRC ${ARDUINO_PATH}/hardware/arduino/avr/libraries/Wire/src/)
 set(ARDUINO_PINS ${ARDUINO_PATH}/hardware/arduino/avr/variants/standard)
+#set(TINY85_SRC /home/mikko/.arduino15/packages/attiny/hardware/avr/1.0.2/variants/tiny8)
+set(TINY85_SRC ${TINY_PKG_PATH}/hardware/avr/1.0.2/variants/tiny8)
 set(TINY_DBG_SERIAL_SRC ${ARDUINO_LIB_PATH}/TinyDebugSerial)
 set(RF24_SRC ${ARDUINO_LIB_PATH}/RF24)
 set(MESSAGES_SRC ${ARDUINO_LIB_PATH}/Messages)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${SRC_DIR} ${ARDUINO_WIRE_SRC} ${TINY_DBG_SERIAL_SRC} ${RF24_SRC} ${MESSAGES_SRC} /home/mikko/.arduino15/packages/attiny/hardware/avr/1.0.2/variants/tiny8)
+INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${SRC_DIR} ${ARDUINO_WIRE_SRC} ${TINY_DBG_SERIAL_SRC} ${RF24_SRC} ${MESSAGES_SRC} ${TINY85_SRC})
 
 add_definitions(-c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=attiny85 -DF_CPU=8000000L -DARDUINO=10612 -DARDUINO_attiny -DARDUINO_ARCH_AVR)
 set(node_number 1 CACHE STRING "node number of led node")
 add_definitions(-Dnode_number=${node_number})
 #add_definitions(-c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega328p -DF_CPU=16000000L -DARDUINO=10800 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR)
 
-set(sources ${SRC_DIR}/Loop.cpp ${SRC_DIR}/Setup.cpp ${SRC_DIR}/Components.cpp)
+set(sources ${SRC_DIR}/Loop.cpp
+            ${SRC_DIR}/Setup.cpp
+            ${SRC_DIR}/Components.cpp
+            ${SRC_DIR}/Blink.cpp
+   )
 set(arduino_core_sources ${ARDUINO_CORE_SRC}/CDC.cpp
                          ${ARDUINO_CORE_SRC}/HardwareSerial.cpp
                          ${ARDUINO_CORE_SRC}/HardwareSerial0.cpp
