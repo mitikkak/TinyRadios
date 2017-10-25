@@ -4,7 +4,8 @@ project(led_node)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${SRC_DIR} ${ARDUINO_WIRE_SRC} ${TINY_DBG_SERIAL_SRC} ${RF24_SRC} ${MESSAGES_SRC} ${TINY85_SRC})
 
-add_definitions(-c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=attiny85 -DF_CPU=8000000L -DARDUINO=10612 -DARDUINO_attiny -DARDUINO_ARCH_AVR)
+include(${PROJECT_ROOT}/tiny85_defs.cmake)
+
 set(node_number 1 CACHE STRING "node number of led node")
 add_definitions(-Dnode_number=${node_number})
 
@@ -14,15 +15,8 @@ set(sources ${SRC_DIR}/Loop.cpp
             ${SRC_DIR}/Blink.cpp
    )
 
-set(tiny_dbg_serial_sources ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial.cpp
-                            ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial9600.cpp)
-set(rf24_sources ${RF24_SRC}/RF24.cpp)
-
 include(${PROJECT_ROOT}/arduino_tools.cmake)
 
-# Linker flags
-set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")   # remove -rdynamic for C
-set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") # remove -rdynamic for CXX
 #set(CMAKE_EXE_LINKER_FLAGS "-Os -Wl,--gc-sections -mmcu=atmega328p")
 set(CMAKE_EXE_LINKER_FLAGS "-w -Os -flto -fuse-linker-plugin -Wl,--gc-sections -mmcu=attiny85")
 

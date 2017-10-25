@@ -1,6 +1,8 @@
 
 cmake_minimum_required(VERSION 3.1)
 
+set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+
 include(arduino_paths.cmake)
 
 set(AVR_COMPILER_DIR ${ARDUINO_PATH}/hardware/tools/avr/bin)
@@ -13,8 +15,13 @@ set(RF24_SRC ${ARDUINO_LIB_PATH}/RF24)
 set(MESSAGES_SRC ${ARDUINO_LIB_PATH}/Messages)
 
 include (arduino_core.cmake)
+set(tiny_dbg_serial_sources ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial.cpp
+                            ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial9600.cpp)
+set(rf24_sources ${RF24_SRC}/RF24.cpp)
 
-set(PROJECT_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+# Linker flags
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")   # remove -rdynamic for C
+set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") # remove -rdynamic for CXX
 
 add_subdirectory(led_node)
-
+add_subdirectory(led_server)
