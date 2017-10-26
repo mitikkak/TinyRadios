@@ -6,7 +6,7 @@ void setup()
 {
     _SERIAL.begin(9600);
     _SERIAL.println("begin");
-    int const beginStatus = radio.begin(); // Start up the radio
+    radio.begin(); // Start up the radio
 
     radio.setAutoAck(1); // Ensure autoACK is enabled
     radio.setRetries(15, 15); // Max delay between retries & number of retries
