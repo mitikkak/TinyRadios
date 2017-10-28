@@ -27,6 +27,8 @@ add_custom_target(bootloader_led_node COMMAND ${ARDUINO_PATH}/hardware/tools/avr
 add_custom_target(elf_to_hex_led_node COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avr-objcopy -O ihex -R .eeprom led_node led_node.hex)
 add_custom_target(upload_led_node COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avrdude -C${ARDUINO_PATH}/hardware/tools/avr/etc/avrdude.conf -v -pattiny85 -cstk500v1 -P/dev/ttyACM0 -b19200 -Uflash:w:./led_node.hex:i
                          DEPENDS elf_to_hex_led_node)
+add_custom_target(upload_led_node_1 COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avrdude -C${ARDUINO_PATH}/hardware/tools/avr/etc/avrdude.conf -v -pattiny85 -cstk500v1 -P/dev/ttyACM1 -b19200 -Uflash:w:./led_node.hex:i
+                         DEPENDS elf_to_hex_led_node)
 
 add_custom_target(usage_led_node COMMAND echo "USAGE:"
                                  COMMAND echo "cmake -Dnode_number:STRING=[integer] ../"
