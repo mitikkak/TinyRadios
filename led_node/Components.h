@@ -8,6 +8,7 @@
 extern TinyDebugSerial _SERIAL;
 extern RF24 radio;
 const int ledPin = 4;
+//const int sendIndicator = 3;
 
 // dependent on RF24's tiny85 specific 3pin -feature
 #define CE_PIN 9

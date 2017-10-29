@@ -42,50 +42,62 @@ Ping getPingRequest()
 }
 
 TIME timePrev = 0;
+TIME prevSwapped = 0;
+bool isSending = false;
 bool connectionEstablished = false;
 TIME const CONNECTION_WAIT_PERIOD = 30000;
+TIME const MODE_SWAP_PERIOD = 5000;
 Blink blinker(5, 300);
+Ping req(0,0);
+
+bool swapMode(TIME const timeNow)
+{
+    if (timeNow - prevSwapped >= MODE_SWAP_PERIOD)
+    {
+        prevSwapped = timeNow;
+        isSending = (isSending == true) ? false : true;
+        return true;
+    }
+    return false;
+}
+
 #ifndef NODE_ALWAYS_ON
 void loop() {
-
     TIME const timeNow = millis();
-    #if 0
-    if (timeNow - timePrev < 10) { return; }
-    timePrev= timeNow;
-    #endif
-    Ping const req = getPingRequest();
-    if (req.header.msgId == PING_REQUEST)
+    if (!isSending)
     {
-      if (!connectionEstablished)
-      {
-          blinker.begin(timeNow);
-//        doBlink(3, 300);
-      }
-      blinker.update(timeNow);
-      connectionEstablished = true;
-      //digitalWrite(ledPin, HIGH);
-      reqs++;
-      for (unsigned i = 0; i < 1; i++)
-      {
-        sendPingResponse(req);
-      }
+        //digitalWrite(sendIndicator, LOW);
+        if (swapMode(timeNow))
+        {
+            _SERIAL.print(prevLog);
+            _SERIAL.print(", reqs: "); _SERIAL.println(reqs);
+            connectionEstablished = false;
+            reqs = 0;
+            digitalWrite(ledPin, LOW);
+            return;
+        }
+        req = getPingRequest();
+        if (req.header.msgId == PING_REQUEST)
+        {
+          if (!connectionEstablished)
+          {
+              blinker.begin(timeNow);
+          }
+          blinker.update(timeNow);
+          connectionEstablished = true;
+          reqs++;
+        }
     }
-#if 0
-    if (millis() - prevLog >= CONNECTION_WAIT_PERIOD)
+    else
     {
-      prevLog = millis();
-      _SERIAL.print(prevLog);
-      _SERIAL.print(", reqs: "); _SERIAL.print(reqs);
-      _SERIAL.print(", timeouts: "); _SERIAL.println(timeouts);
-      if (!reqs)
-      {
-        connectionEstablished = false;
-        digitalWrite(ledPin, HIGH);
-      }
-      reqs = 0;
-      timeouts = 0;
-    }                     // wait for a second
-#endif
+        //digitalWrite(sendIndicator, HIGH);
+        if (swapMode(timeNow))
+        {
+            _SERIAL.println("end of sending period");
+            return;
+        }
+        sendPingResponse(req);
+    }
 }
 #else
 void loop() {
