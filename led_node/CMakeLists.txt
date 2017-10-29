@@ -8,6 +8,7 @@ include(${PROJECT_ROOT}/tiny85_defs.cmake)
 
 set(node_number 1 CACHE STRING "node number of led node")
 add_definitions(-Dnode_number=${node_number})
+#add_definitions(-DNODE_ALWAYS_ON)
 
 set(sources ${SRC_DIR}/Loop.cpp
             ${SRC_DIR}/Setup.cpp
