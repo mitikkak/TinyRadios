@@ -15,6 +15,7 @@ set(ALTERNATE_TINY85_SRC ${TINY_PKG_PATH}/variants/tiny8)
 set(TINY_DBG_SERIAL_SRC ${ARDUINO_LIB_PATH}/TinyDebugSerial)
 set(RF24_SRC ${ARDUINO_LIB_PATH}/RF24)
 set(MESSAGES_SRC ${ARDUINO_LIB_PATH}/Messages)
+set(SHARED_SRC ${PROJECT_ROOT}/shared)
 
 include (arduino_core.cmake)
 set(tiny_dbg_serial_sources ${TINY_DBG_SERIAL_SRC}/TinyDebugSerial.cpp

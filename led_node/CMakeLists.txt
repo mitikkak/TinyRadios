@@ -1,8 +1,8 @@
 
 project(led_node)
 
-set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${SRC_DIR} ${ARDUINO_WIRE_SRC} ${TINY_DBG_SERIAL_SRC} ${RF24_SRC} ${MESSAGES_SRC} ${TINY85_SRC} ${ALTERNATE_TINY85_SRC})
+set(MY_SRC ${CMAKE_CURRENT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${SHARED_SRC} ${MY_SRC} ${ARDUINO_WIRE_SRC} ${TINY_DBG_SERIAL_SRC} ${RF24_SRC} ${MESSAGES_SRC} ${TINY85_SRC} ${ALTERNATE_TINY85_SRC})
 
 include(${PROJECT_ROOT}/tiny85_defs.cmake)
 
@@ -10,10 +10,12 @@ set(node_number 1 CACHE STRING "node number of led node")
 add_definitions(-Dnode_number=${node_number})
 #add_definitions(-DNODE_ALWAYS_ON)
 
-set(sources ${SRC_DIR}/Loop.cpp
-            ${SRC_DIR}/Setup.cpp
-            ${SRC_DIR}/Components.cpp
-            ${SRC_DIR}/Blink.cpp
+set(sources ${MY_SRC}/Loop.cpp
+            ${MY_SRC}/Setup.cpp
+            ${MY_SRC}/Components.cpp
+            ${MY_SRC}/Blink.cpp
+   )
+set(shared ${SHARED_SRC}/RadioMode.cpp
    )
 
 include(${PROJECT_ROOT}/arduino_tools.cmake)
@@ -21,7 +23,7 @@ include(${PROJECT_ROOT}/arduino_tools.cmake)
 #set(CMAKE_EXE_LINKER_FLAGS "-Os -Wl,--gc-sections -mmcu=atmega328p")
 set(CMAKE_EXE_LINKER_FLAGS "-w -Os -flto -fuse-linker-plugin -Wl,--gc-sections -mmcu=attiny85")
 
-add_executable(${PROJECT_NAME} ${sources} ${arduino_core_sources} ${tiny_dbg_serial_sources} ${rf24_sources})
+add_executable(${PROJECT_NAME} ${sources} ${shared} ${arduino_core_sources} ${tiny_dbg_serial_sources} ${rf24_sources})
 
 #Burn bootloader, 8Mhz internal clock
 add_custom_target(bootloader_led_node COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avrdude -C${ARDUINO_PATH}/hardware/tools/avr/etc/avrdude.conf -v -v -v -v -pattiny85 -cstk500v1 -P/dev/ttyACM0 -b19200 -e -Uefuse:w:0xff:m -Uhfuse:w:0xdf:m -Ulfuse:w:0xe2:m)

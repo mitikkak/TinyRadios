@@ -1,13 +1,13 @@
 
 project(led_server)
 
-set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(MY_SRC ${CMAKE_CURRENT_SOURCE_DIR})
 
 INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${ARDUINO_PINS} ${RF24_SRC} ${ARDUINO_SPI_SRC} ${MESSAGES_SRC})
 
-set(sources ${SRC_DIR}/Loop.cpp
-            ${SRC_DIR}/Setup.cpp
-            ${SRC_DIR}/Components.cpp
+set(sources ${MY_SRC}/Loop.cpp
+            ${MY_SRC}/Setup.cpp
+            ${MY_SRC}/Components.cpp
    )
 
 include(${PROJECT_ROOT}/arduino_tools.cmake)

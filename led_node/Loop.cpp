@@ -1,6 +1,8 @@
 
 #include "Components.h"
 #include "Blink.h"
+#include "Constants.h"
+#include "RadioMode.h"
 
 TIME prevLog = 0;
 int timeOuts = 0;
@@ -41,33 +43,24 @@ Ping getPingRequest()
   return req;
 }
 
-TIME timePrev = 0;
-TIME prevSwapped = 0;
-bool isSending = false;
+RadioMode mode;
+
+
 bool connectionEstablished = false;
 TIME const CONNECTION_WAIT_PERIOD = 30000;
-TIME const MODE_SWAP_PERIOD = 5000;
 Blink blinker(5, 300);
 Ping req(0,0);
 
-bool swapMode(TIME const timeNow)
-{
-    if (timeNow - prevSwapped >= MODE_SWAP_PERIOD)
-    {
-        prevSwapped = timeNow;
-        isSending = (isSending == true) ? false : true;
-        return true;
-    }
-    return false;
-}
+
+
 
 #ifndef NODE_ALWAYS_ON
 void loop() {
     TIME const timeNow = millis();
-    if (!isSending)
+    if (!mode.isSending())
     {
         //digitalWrite(sendIndicator, LOW);
-        if (swapMode(timeNow))
+        if (mode.swap(timeNow))
         {
             _SERIAL.print(prevLog);
             _SERIAL.print(", reqs: "); _SERIAL.println(reqs);
@@ -91,7 +84,7 @@ void loop() {
     else
     {
         //digitalWrite(sendIndicator, HIGH);
-        if (swapMode(timeNow))
+        if (mode.swap(timeNow))
         {
             _SERIAL.println("end of sending period");
             return;
