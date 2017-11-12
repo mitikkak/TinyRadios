@@ -48,7 +48,7 @@ RadioMode mode;
 
 bool connectionEstablished = false;
 TIME const CONNECTION_WAIT_PERIOD = 30000;
-Blink blinker(5, 300);
+Blink blinker(5, 300, ledPin);
 Ping req(0,0);
 
 

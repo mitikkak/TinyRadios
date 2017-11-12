@@ -29,3 +29,4 @@ set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "") # remove -rdynamic for CXX
 
 add_subdirectory(led_node)
 add_subdirectory(led_server)
+add_subdirectory(unit_tests)

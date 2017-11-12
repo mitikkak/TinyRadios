@@ -1,30 +1,21 @@
 
 #include "Blink.h"
+#include "Arduino.h"
 
-void doBlink(const int rounds, const int delay_)
-{
-  for (int r = 0; r < rounds; r++)
-  {
-    digitalWrite(ledPin, HIGH);
-    delay(delay_);
-    digitalWrite(ledPin, LOW);
-    delay(delay_);
-  }
-}
 void Blink::swapState()
 {
     state = (state == HIGH) ? LOW : HIGH;
-    digitalWrite(ledPin, state);
+    digitalWrite(pin, state);
 }
-Blink::Blink(const int rounds_, const TIME delay_)
-: rounds(rounds_), delay(delay_), startTime(0), prevTime(0), endTime(0), state(LOW)
+Blink::Blink(const int rounds_, const TIME delay_, const int pin_)
+: rounds(rounds_), delay(delay_), startTime(0), prevTime(0), endTime(0), state(LOW), pin(pin_)
 {
 }
 void Blink::begin(TIME const now)
 {
     startTime = now;
     endTime = now + (rounds * delay);
-    digitalWrite(ledPin, state);
+    digitalWrite(pin, state);
 }
 void Blink::update(TIME const now)
 {
