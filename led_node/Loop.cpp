@@ -9,12 +9,6 @@ int timeOuts = 0;
 int msgs = 0;
 TIME stateChanged = 0;
 
-void sendPingResponse(Ping const&  req)
-{
-  radio.stopListening();
-  Ping resp(PING_RESPONSE, req.header.transactionId);
-  radio.write( &resp, sizeof(resp) );
-}
 unsigned int reqs = 0;
 unsigned int timeouts = 0;
 
@@ -53,6 +47,7 @@ Ping req(0,0);
 
 
 
+#include "LedNodeLoop.h"
 
 #ifndef NODE_ALWAYS_ON
 void loop() {
@@ -89,7 +84,7 @@ void loop() {
             _SERIAL.println("end of sending period");
             return;
         }
-        sendPingResponse(req);
+        ledNodeLoopElse(req, radio);
     }
 }
 #else

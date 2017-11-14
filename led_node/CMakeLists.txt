@@ -13,9 +13,11 @@ add_definitions(-Dnode_number=${node_number})
 set(sources ${MY_SRC}/Loop.cpp
             ${MY_SRC}/Setup.cpp
             ${MY_SRC}/Components.cpp
+            ${MY_SRC}/LedNodeLoop.cpp
    )
 set(shared ${SHARED_SRC}/RadioMode.cpp
            ${SHARED_SRC}/Blink.cpp
+           ${SHARED_SRC}/Messages.cpp
    )
 
 include(${PROJECT_ROOT}/arduino_tools.cmake)
