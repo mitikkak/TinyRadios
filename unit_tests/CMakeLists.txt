@@ -20,8 +20,11 @@ set(led_node_sources
      ${LEDNODE_SRC}/LedNodeLoop.cpp
    )
 set(shared_sources
-     ${SHARED_SRC}/Messages.cpp)
+     ${SHARED_SRC}/Messages.cpp
+     ${SHARED_SRC}/RadioMode.cpp
+   )
 
+add_definitions(-c -g -Os -w -std=gnu++11)
 add_executable(${PROJECT_NAME} ${sources} ${led_node_sources} ${shared_sources})
 target_link_libraries(${PROJECT_NAME} ${GTEST_LIBRARIES} pthread)
 
