@@ -1,27 +1,37 @@
-//#include "Components.h"
 #include "Messages.h"
 #include "RadioMode.h"
-//#include "Constants.h"
 
-
-
-RadioMode::RadioMode()
-:isSending_(false),timePrev(0), prevSwapped(0)
+RadioMode::RadioMode(TIME const listen, TIME const send)
+:state_(inactive),timePrev(0), prevSwapped(0), listenPeriod(listen), sendPeriod(send)
 {}
-void RadioMode::start(bool const sending, TIME const now)
+void RadioMode::start(State const initial, TIME const now)
 {
-    isSending_ = sending;
+    state_ = initial;
     timePrev = now;
     prevSwapped = now;
 }
-bool RadioMode::swap(TIME const timeNow)
+bool RadioMode::swap(TIME const timeNow, bool const msgReceived)
 {
-    if (timeNow - prevSwapped >= MODE_SWAP_PERIOD)
+    bool retValue = false;
+    if (state() == sending)
     {
-        prevSwapped = timeNow;
-        isSending_ = (isSending_ == true) ? false : true;
-        return true;
+        if (timeNow - prevSwapped >= sendPeriod)
+        {
+            prevSwapped = timeNow;
+            state_ = listening;
+            retValue = true;
+        }
     }
-    return false;
+    else
+    {
+        if (msgReceived || timeNow - prevSwapped >= listenPeriod)
+        {
+            prevSwapped = timeNow;
+            state_ = sending;
+            retValue = true;
+        }
+
+    }
+    return retValue;
 }
-bool RadioMode::isSending() const {return isSending_;}
+RadioMode::State RadioMode::state() const {return state_;}
