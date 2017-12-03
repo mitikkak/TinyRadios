@@ -32,7 +32,7 @@ public:
         memcpy(static_cast<void*>(writeBuffer), buf, len);
         return true;
     }
-    uint8_t* written()
+    const uint8_t* written() const
     {
         return writeBuffer;
     }

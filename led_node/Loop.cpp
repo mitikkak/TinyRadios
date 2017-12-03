@@ -1,7 +1,6 @@
 
 #include "Components.h"
 #include "Blink.h"
-#include "Constants.h"
 #include "RadioMode.h"
 
 TIME prevLog = 0;
@@ -37,7 +36,7 @@ Ping getPingRequest()
   return req;
 }
 
-RadioMode mode;
+RadioMode mode(RadioMode::infinite, 5000);
 
 
 bool connectionEstablished = false;
@@ -52,39 +51,37 @@ Ping req(0,0);
 #ifndef NODE_ALWAYS_ON
 void loop() {
     TIME const timeNow = millis();
-    if (!mode.isSending())
+    if (RadioMode::listening == mode.state())
     {
-        //digitalWrite(sendIndicator, LOW);
-        if (mode.swap(timeNow))
-        {
-            _SERIAL.print(prevLog);
-            _SERIAL.print(", reqs: "); _SERIAL.println(reqs);
-            connectionEstablished = false;
-            reqs = 0;
-            digitalWrite(ledPin, LOW);
-            return;
-        }
+        bool reqReceived = false;
         req = getPingRequest();
         if (req.header.msgId == PING_REQUEST)
         {
           if (!connectionEstablished)
           {
-              blinker.begin(timeNow);
+              //blinker.begin(timeNow);
           }
-          blinker.update(timeNow);
+          //blinker.update(timeNow);
           connectionEstablished = true;
+          digitalWrite(ledPin, HIGH);
           reqs++;
+          reqReceived = true;
+        }
+        //digitalWrite(sendIndicator, LOW);
+        if (mode.swap(timeNow, reqReceived))
+        {
+            _SERIAL.print(prevLog);
+            _SERIAL.print(", reqs: "); _SERIAL.println(reqs);
+            connectionEstablished = false;
+            reqs = 0;
+            //digitalWrite(ledPin, LOW);
+            return;
         }
     }
     else
     {
         //digitalWrite(sendIndicator, HIGH);
-        if (mode.swap(timeNow))
-        {
-            _SERIAL.println("end of sending period");
-            return;
-        }
-        ledNodeLoopElse(req, radio);
+        ledNodeLoopElse(req, radio, mode, timeNow, _SERIAL);
     }
 }
 #else
