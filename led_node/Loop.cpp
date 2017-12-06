@@ -68,15 +68,7 @@ void loop() {
           reqReceived = true;
         }
         //digitalWrite(sendIndicator, LOW);
-        if (mode.swap(timeNow, reqReceived))
-        {
-            _SERIAL.print(prevLog);
-            _SERIAL.print(", reqs: "); _SERIAL.println(reqs);
-            connectionEstablished = false;
-            reqs = 0;
-            //digitalWrite(ledPin, LOW);
-            return;
-        }
+        ledNodeLoopIf(reqs, reqReceived, mode, timeNow, _SERIAL);
     }
     else
     {

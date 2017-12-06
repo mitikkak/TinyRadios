@@ -13,3 +13,15 @@ void ledNodeLoopElse(Ping const&  req, RF24& radio, RadioMode& mode, TIME const 
     }
     sendPingResponse(req, radio);
 }
+void ledNodeLoopIf(unsigned int& reqs, bool const reqReceived, RadioMode& mode, TIME const timeNow, TinyDebugSerial& _SERIAL)
+{
+    if (mode.swap(timeNow, reqReceived))
+    {
+        _SERIAL.print(timeNow);
+        _SERIAL.print(", reqs: "); _SERIAL.println(reqs);
+        //connectionEstablished = false;
+        reqs = 0;
+        //digitalWrite(ledPin, LOW);
+        return;
+    }
+}

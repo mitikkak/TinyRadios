@@ -11,7 +11,7 @@ set(sources
     ${TEST_SRC}/Runner.cpp
     ${TEST_SRC}/TestRadioMode.cpp
 )
-include_directories(${LEDNODE_SRC}
+include_directories(${PROJECT_ROOT}
                     ${SHARED_SRC}
                     ${STUBS_SRC}
                    )
