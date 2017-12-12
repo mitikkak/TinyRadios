@@ -23,9 +23,12 @@ set(shared_sources
      ${SHARED_SRC}/Messages.cpp
      ${SHARED_SRC}/RadioMode.cpp
    )
+set(stub_sources
+    ${STUBS_SRC}/Arduino.cpp)
 
 add_definitions(-c -g -Os -w -std=gnu++11)
-add_executable(${PROJECT_NAME} ${sources} ${led_node_sources} ${shared_sources})
+add_definitions(-Dnode_number=1)
+add_executable(${PROJECT_NAME} ${sources} ${led_node_sources} ${shared_sources} ${stub_sources})
 target_link_libraries(${PROJECT_NAME} ${GTEST_LIBRARIES} pthread)
 
 

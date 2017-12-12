@@ -1,16 +1,20 @@
 
 #pragma once
 
+#include <assert.h>
+
 typedef char byte;
 
-enum PinState{ LOW, HIGH };
+static constexpr unsigned LOW = 0;
+static constexpr unsigned HIGH = 1;
 
 namespace Arduino {
 
-unsigned ledState(unsigned const pin)
-{
-    return LOW;
+static constexpr unsigned numPins = 14;
+unsigned ledState(unsigned const pin);
+void reset();
 }
 
-}
+void digitalWrite(unsigned pin, unsigned state);
+
 

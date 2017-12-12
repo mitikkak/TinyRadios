@@ -53,22 +53,9 @@ void loop() {
     TIME const timeNow = millis();
     if (RadioMode::listening == mode.state())
     {
-        bool reqReceived = false;
+
         req = getPingRequest();
-        if (req.header.msgId == PING_REQUEST)
-        {
-          if (!connectionEstablished)
-          {
-              //blinker.begin(timeNow);
-          }
-          //blinker.update(timeNow);
-          connectionEstablished = true;
-          digitalWrite(ledPin, HIGH);
-          reqs++;
-          reqReceived = true;
-        }
-        //digitalWrite(sendIndicator, LOW);
-        ledNodeLoopIf(reqs, reqReceived, mode, timeNow, _SERIAL);
+        ledNodeLoopIf(req, reqs, mode, timeNow, _SERIAL);
     }
     else
     {
