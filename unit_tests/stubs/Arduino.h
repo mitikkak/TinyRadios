@@ -16,5 +16,6 @@ void reset();
 }
 
 void digitalWrite(unsigned pin, unsigned state);
+unsigned long millis();
 
 

@@ -17,3 +17,7 @@ void digitalWrite(unsigned pin, unsigned state)
     assert(pin < Arduino::numPins);
     pins[pin] = state;
 }
+unsigned long millis()
+{
+    return 0;
+}

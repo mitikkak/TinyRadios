@@ -1,16 +1,40 @@
 
-#include "Components.h"
-#include "Blink.h"
-#include "RadioMode.h"
+#include "led_node/Loop.h"
+#include "led_node/Components.h"
 
-TIME prevLog = 0;
-int timeOuts = 0;
-int msgs = 0;
-TIME stateChanged = 0;
+#ifndef NODE_ALWAYS_ON
+void loop() {
+    TIME const timeNow = millis();
+    if (RadioMode::listening == mode.state())
+    {
+        ledNodeLoopIf(mode, timeNow, _SERIAL);
+    }
+    else
+    {
+        //digitalWrite(sendIndicator, HIGH);
+        ledNodeLoopElse(radio, mode, timeNow, _SERIAL);
+    }
+}
+#else
+void loop() {
 
-unsigned int reqs = 0;
-unsigned int timeouts = 0;
+}
+#endif
 
+void ledNodeLoop()
+{
+
+}
+void ledNodeLoopElse(RF24& radio, RadioMode& mode, TIME const timeNow, TinyDebugSerial& _SERIAL)
+{
+    if (mode.swap(timeNow, false))
+    {
+        _SERIAL.println("end of sending period");
+        return;
+    }
+    const Ping req(0,0);
+    sendPingResponse(req, radio);
+}
 Ping getPingRequest()
 {
   radio.startListening();
@@ -35,36 +59,28 @@ Ping getPingRequest()
   }
   return req;
 }
-
-RadioMode mode(RadioMode::infinite, 5000);
-
-
-bool connectionEstablished = false;
-TIME const CONNECTION_WAIT_PERIOD = 30000;
-Blink blinker(5, 300, ledPin);
-Ping req(0,0);
-
-
-
-#include "LedNodeLoop.h"
-
-#ifndef NODE_ALWAYS_ON
-void loop() {
-    TIME const timeNow = millis();
-    if (RadioMode::listening == mode.state())
+void ledNodeLoopIf(RadioMode& mode, TIME const timeNow, TinyDebugSerial& _SERIAL)
+{
+    Ping const req = getPingRequest();
+    bool reqReceived = false;
+    if (req.header.msgId == PING_REQUEST)
     {
-
-        req = getPingRequest();
-        ledNodeLoopIf(req, reqs, mode, timeNow, _SERIAL);
+//      if (!connectionEstablished)
+//      {
+//          //blinker.begin(timeNow);
+//      }
+      //blinker.update(timeNow);
+//      connectionEstablished = true;
+      digitalWrite(ledPin, HIGH);
+      reqReceived = true;
     }
-    else
+    if (mode.swap(timeNow, reqReceived))
     {
-        //digitalWrite(sendIndicator, HIGH);
-        ledNodeLoopElse(req, radio, mode, timeNow, _SERIAL);
+        _SERIAL.print(timeNow);
+        _SERIAL.print(", reqs: "); _SERIAL.println(1);
+        //connectionEstablished = false;
+        //digitalWrite(ledPin, LOW);
+        return;
     }
 }
-#else
-void loop() {
 
-}
-#endif

@@ -17,16 +17,18 @@ include_directories(${PROJECT_ROOT}
                    )
 set(led_node_sources
      ${LED_NODE_TEST_SRC}/TestLedNodeLoop.cpp
-     ${LEDNODE_SRC}/LedNodeLoop.cpp
+     ${LEDNODE_SRC}/Loop.cpp
+     ${LEDNODE_SRC}/Components.cpp
    )
 set(shared_sources
      ${SHARED_SRC}/Messages.cpp
      ${SHARED_SRC}/RadioMode.cpp
    )
 set(stub_sources
-    ${STUBS_SRC}/Arduino.cpp)
+    ${STUBS_SRC}/Arduino.cpp
+    ${STUBS_SRC}/RF24.cpp)
 
-add_definitions(-c -g -Os -w -std=gnu++11)
+add_definitions(-c -g -w -std=gnu++11)
 add_definitions(-Dnode_number=1)
 add_executable(${PROJECT_NAME} ${sources} ${led_node_sources} ${shared_sources} ${stub_sources})
 target_link_libraries(${PROJECT_NAME} ${GTEST_LIBRARIES} pthread)

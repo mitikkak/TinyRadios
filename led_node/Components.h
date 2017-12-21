@@ -4,9 +4,11 @@
 #include "TinyDebugSerial.h"
 #include "RF24.h"
 #include "Messages.h"
+#include "RadioMode.h"
 
 extern TinyDebugSerial _SERIAL;
 extern RF24 radio;
+extern RadioMode mode;
 const int ledPin = 4;
 //const int sendIndicator = 3;
 
