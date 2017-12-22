@@ -21,3 +21,7 @@ unsigned long millis()
 {
     return 0;
 }
+unsigned long micros()
+{
+    return 0;
+}

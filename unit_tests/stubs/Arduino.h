@@ -2,6 +2,7 @@
 #pragma once
 
 #include <assert.h>
+#include "TinyDebugSerial.h"
 
 typedef char byte;
 
@@ -17,5 +18,8 @@ void reset();
 
 void digitalWrite(unsigned pin, unsigned state);
 unsigned long millis();
+unsigned long micros();
+
+extern TinyDebugSerial Serial;
 
 

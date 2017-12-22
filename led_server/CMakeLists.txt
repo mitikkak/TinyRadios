@@ -6,6 +6,7 @@ set(MY_SRC ${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${ARDUINO_PINS} ${RF24_SRC} ${ARDUINO_SPI_SRC} ${MESSAGES_SRC})
 
 set(sources ${MY_SRC}/Loop.cpp
+            ${MY_SRC}/LedServerLoop.cpp
             ${MY_SRC}/Setup.cpp
             ${MY_SRC}/Components.cpp
    )

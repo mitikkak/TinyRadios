@@ -7,13 +7,13 @@
 typedef unsigned char uint8_t;
 class RF24
 {
-    bool startedListening;
-    bool stoppedListening;
+    bool started;
+    bool stopped;
     bool givePing;
     uint8_t* writeBuffer;
 public:
     RF24(int, int)
-        : startedListening(false), stoppedListening(false), givePing(false), writeBuffer(0)
+        : started(false), stopped(false), givePing(false), writeBuffer(0)
     {}
     ~RF24()
     {
@@ -21,11 +21,19 @@ public:
     }
     void startListening()
     {
-        startedListening = true;
+        started = true;
     }
     void stopListening()
     {
-        stoppedListening = true;
+        stopped = true;
+    }
+    bool stoppedListening() const
+    {
+        return stopped;
+    }
+    bool startedListening() const
+    {
+        return started;
     }
     bool available() const
     {
@@ -35,7 +43,7 @@ public:
 
     bool write( const void* buf, uint8_t len )
     {
-        if (!stoppedListening)
+        if (!stoppedListening())
         {
             printf(" ERROR: RF24 write called before stopListening!\n");
         }
@@ -50,6 +58,10 @@ public:
     void ping(bool const val)
     {
         givePing = val;
+    }
+    void openWritingPipe(const uint8_t* address)
+    {
+
     }
 
 };

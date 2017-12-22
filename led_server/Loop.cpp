@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "Components.h"
 #include "Messages.h"
+#include "Loop.h"
 
 #if 0
 byte remote_address[3][5] = {
@@ -10,18 +11,12 @@ byte remote_address[3][5] = {
   {0xAB, 0xBA, 0xAC, 0xDC, 0x3}
 };
 #else
-byte remote_address[3][5] = {
+uint8_t remote_address[3][5] = {
   {0xAA, 0xBB, 0xCC, 0xDD, 0x1},
   {0xAA, 0xBB, 0xCC, 0xDD, 0x2},
   {0xAA, 0xBB, 0xCC, 0xDD, 0x3}
 };
 #endif
-void sendPingRequest(unsigned int const rounds)
-{
-  radio.stopListening();
-  Ping request(PING_REQUEST, rounds);
-  radio.write( &request, sizeof(request) );
-}
 Ping noResp(0,0);
 Ping getPingResponse()
 {
@@ -30,7 +25,7 @@ Ping getPingResponse()
   TIME const started_waiting_at = micros();
   while ( !radio.available() ){ // While nothing is received
     if (micros() - started_waiting_at > 2000 ){ // If waited longer than 200ms, indicate timeout and exit while loop
-      //_SERIAL.println("timeout");
+      //Serial.println("timeout");
       return noResp;
     }
   }
@@ -49,7 +44,7 @@ struct Stats
 };
 Stats stats;
 const unsigned int MAX_ATTEMPTS = 10;
-Ping onePingRound(uint32_t const receiver, unsigned int const rounds, TIME& timeSpent, unsigned int& attempts)
+Ping onePingRound(unsigned int const receiver, unsigned int const rounds, TIME& timeSpent, unsigned int& attempts)
 {
     radio.openWritingPipe(remote_address[receiver]); // Write to device address '2Node'
     TIME const timeStart = millis();
@@ -61,7 +56,7 @@ Ping onePingRound(uint32_t const receiver, unsigned int const rounds, TIME& time
       Ping const resp = getPingResponse();
       if (resp.header.msgId == PING_RESPONSE)
       {
-        _SERIAL.println("resp: ");
+        Serial.println("resp: ");
         timeSpent = millis()-timeStart;
         return resp;
       }
@@ -101,11 +96,11 @@ void loop()
     if (millis() - prevLog >= 5000)
     {
       prevLog = millis();
-      _SERIAL.print(prevLog);
-      _SERIAL.print(", rounds: "); _SERIAL.print(stats.rounds);
-      _SERIAL.print(", ok:");_SERIAL.print(stats.ok);
-      _SERIAL.print(", nok:");_SERIAL.print(stats.nok);
-      _SERIAL.print(", attempts: "); _SERIAL.print(stats.attempts);
-      _SERIAL.print(", spent: "); _SERIAL.println(stats.spent);
+      Serial.print(prevLog);
+      Serial.print(", rounds: "); Serial.print(stats.rounds);
+      Serial.print(", ok:");Serial.print(stats.ok);
+      Serial.print(", nok:");Serial.print(stats.nok);
+      Serial.print(", attempts: "); Serial.print(stats.attempts);
+      Serial.print(", spent: "); Serial.println(stats.spent);
     }
 }
