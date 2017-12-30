@@ -14,6 +14,8 @@ namespace Arduino {
 static constexpr unsigned numPins = 14;
 unsigned ledState(unsigned const pin);
 void reset();
+extern unsigned long timeNow;
+extern unsigned long timeStep;
 }
 
 void digitalWrite(unsigned pin, unsigned state);

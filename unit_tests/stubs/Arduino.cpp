@@ -19,9 +19,12 @@ void digitalWrite(unsigned pin, unsigned state)
 }
 unsigned long millis()
 {
-    return 0;
+    Arduino::timeNow += Arduino::timeStep;
+    return Arduino::timeNow;
 }
 unsigned long micros()
 {
-    return 0;
+    return millis()*1000;
 }
+unsigned long Arduino::timeNow = 0;
+unsigned long Arduino::timeStep = 1;

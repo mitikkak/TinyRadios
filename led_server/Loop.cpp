@@ -1,22 +1,10 @@
 
 #include "Arduino.h"
 #include "Components.h"
-#include "Messages.h"
+#include "shared/Messages.h"
 #include "Loop.h"
 
 #if 0
-byte remote_address[3][5] = {
-  {0xAB, 0xBA, 0xAC, 0xDC, 0x1},
-  {0xAB, 0xBA, 0xAC, 0xDC, 0x2},
-  {0xAB, 0xBA, 0xAC, 0xDC, 0x3}
-};
-#else
-uint8_t remote_address[3][5] = {
-  {0xAA, 0xBB, 0xCC, 0xDD, 0x1},
-  {0xAA, 0xBB, 0xCC, 0xDD, 0x2},
-  {0xAA, 0xBB, 0xCC, 0xDD, 0x3}
-};
-#endif
 Ping noResp(0,0);
 Ping getPingResponse()
 {
@@ -33,6 +21,7 @@ Ping getPingResponse()
   radio.read( &resp, sizeof(resp) );
   return resp;
 }
+#endif
 struct Stats
 {
   Stats(): rounds(0), attempts(0), ok(0), spent(0) {}
@@ -44,6 +33,7 @@ struct Stats
 };
 Stats stats;
 const unsigned int MAX_ATTEMPTS = 10;
+#if 0
 Ping onePingRound(unsigned int const receiver, unsigned int const rounds, TIME& timeSpent, unsigned int& attempts)
 {
     radio.openWritingPipe(remote_address[receiver]); // Write to device address '2Node'
@@ -68,13 +58,17 @@ Ping onePingRound(unsigned int const receiver, unsigned int const rounds, TIME& 
     while(attempts < MAX_ATTEMPTS);
     return noResp;
 }
+#endif
 
 TIME prevLog = 0;
 void loop()
 {
     TIME timeSpent = -1;
     unsigned int attempts = 0;
-    Ping const resp = onePingRound(0, stats.rounds, timeSpent, attempts);
+    TIME const listenPeriod = 500;
+    TIME const sendPeriod = 500;
+    RadioMode mode(listenPeriod, sendPeriod);
+    Ping const resp = onePingRound(mode, 0, stats.rounds, timeSpent, attempts);
     //Ping const resp2 = onePingRound(1, stats.rounds, timeSpent, attempts);
     //Ping const resp3 = onePingRound(2, stats.rounds, timeSpent, attempts);
 
