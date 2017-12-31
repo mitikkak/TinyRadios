@@ -30,19 +30,38 @@ TEST_F(TestLedServerLoop, PingReq)
     ASSERT_EQ(PING_REQUEST, msgId);
     ASSERT_EQ(trId, rounds);
 }
-#if 1
-TEST_F(TestLedServerLoop, onePingRound)
+TEST_F(TestLedServerLoop, onePingRound_respReceivedOnFirstAttempt)
 {
-    TIME const listenPeriod = 2;
+    unsigned int const transactionId = 17;
+    radio.setMsgId(PING_RESPONSE);
+    radio.setTransactionId(transactionId);
+    TIME const listenPeriod = 9;
+    TIME const sendPeriod = 4;
+    unsigned int const receiver = 0;
+    RadioMode mode(listenPeriod, sendPeriod);
+    TIME timeSpent = 0;
+    unsigned int attempts = 0;
+    bool const success = onePingRound(mode, receiver, transactionId, timeSpent, attempts);
+    ASSERT_EQ(true, success);
+    const int respReceivedOnFirstAttempt = 1;
+    const int causedByAdruinoStub = 1;
+    ASSERT_EQ(sendPeriod + respReceivedOnFirstAttempt + causedByAdruinoStub, timeSpent);
+}
+TEST_F(TestLedServerLoop, onePingRound_noResp)
+{
+    unsigned int const transactionId = 17;
+    const int msgId = 7777;
+    radio.setMsgId(msgId);
+    radio.setTransactionId(0);
+    TIME const listenPeriod = 6;
     TIME const sendPeriod = 2;
     unsigned int const receiver = 0;
     RadioMode mode(listenPeriod, sendPeriod);
-    unsigned int const rounds = 17;
     TIME timeSpent = 0;
     unsigned int attempts = 0;
-    Ping const resp = onePingRound(mode, receiver, rounds, timeSpent, attempts);
-    ASSERT_EQ(PING_RESPONSE, resp.header.msgId);
-    ASSERT_EQ(rounds, resp.header.transactionId);
-    ASSERT_EQ(Arduino::timeNow + sendPeriod, timeSpent);
+    bool const success = onePingRound(mode, receiver, transactionId, timeSpent, attempts);
+    ASSERT_EQ(false, success);
+     const int causedByAdruinoStub = 1;
+    ASSERT_EQ(sendPeriod + listenPeriod + causedByAdruinoStub, timeSpent);
 }
-#endif
+

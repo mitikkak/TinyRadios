@@ -9,11 +9,12 @@ class RF24
 {
     bool started;
     bool stopped;
-    bool givePing;
+    int msgId;
+    int transactionId;
     uint8_t* writeBuffer;
 public:
     RF24(int, int)
-        : started(false), stopped(false), givePing(false), writeBuffer(0)
+        : started(false), stopped(false), msgId(0), transactionId(0), writeBuffer(0)
     {}
     ~RF24()
     {
@@ -55,9 +56,13 @@ public:
     {
         return writeBuffer;
     }
-    void ping(bool const val)
+    void setMsgId(int const val)
     {
-        givePing = val;
+        msgId = val;
+    }
+    void setTransactionId(int const val)
+    {
+        transactionId = val;
     }
     void openWritingPipe(const uint8_t* address)
     {

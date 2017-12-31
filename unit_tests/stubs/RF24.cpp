@@ -4,9 +4,7 @@
 
 void RF24::read(void* handle, unsigned const size) const
 {
-    if (givePing)
-    {
-        Ping* req = static_cast<Ping*>(handle);
-        req->header.msgId = PING_REQUEST;
-    }
+    Ping* req = static_cast<Ping*>(handle);
+    req->header.msgId = msgId;
+    req->header.transactionId = transactionId;
 }

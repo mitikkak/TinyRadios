@@ -28,14 +28,15 @@ uint8_t remote_address[3][5] = {
   {0xAA, 0xBB, 0xCC, 0xDD, 0x2},
   {0xAA, 0xBB, 0xCC, 0xDD, 0x3}
 };
-Ping onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int const rounds, TIME& timeSpent, unsigned int& attempts)
+bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int const transactionId, TIME& timeSpent, unsigned int& attempts)
 {
     radio.openWritingPipe(remote_address[receiver]);
     TIME timeNow = millis();
+    TIME const startTime = timeNow;
     mode.start(RadioMode::sending, timeNow);
     while(!mode.swap(timeNow, false))
     {
-        sendPingRequest(rounds);
+        sendPingRequest(transactionId);
         timeNow = millis();
     }
     bool respReceived = false;
@@ -45,5 +46,6 @@ Ping onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int con
         respReceived = getPingResponse(resp);
         timeNow = millis();
     }
-    return resp;
+    timeSpent = millis() - startTime;
+    return (resp.header.msgId == PING_RESPONSE) && (resp.header.transactionId == transactionId);
 }

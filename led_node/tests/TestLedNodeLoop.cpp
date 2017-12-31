@@ -32,7 +32,8 @@ TEST_F(TestLedNodeLoop, responsePeriodIsOn)
 }
 TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingReceived)
 {
-    radio.ping(true);
+    const int msgId = PING_REQUEST;
+    radio.setMsgId(msgId);
     TIME const timeNow = 6;
     TinyDebugSerial serial;
     ASSERT_EQ("", serial.getPrints());
@@ -48,7 +49,8 @@ TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingReceived)
 }
 TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingNotReceived)
 {
-    radio.ping(false);
+    const int msgId = 7777;
+    radio.setMsgId(msgId);
     TIME const timeNow = 6;
     TinyDebugSerial serial;
     RadioMode mode(300,300);

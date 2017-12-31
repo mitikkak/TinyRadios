@@ -68,14 +68,14 @@ void loop()
     TIME const listenPeriod = 500;
     TIME const sendPeriod = 500;
     RadioMode mode(listenPeriod, sendPeriod);
-    Ping const resp = onePingRound(mode, 0, stats.rounds, timeSpent, attempts);
+    bool const success = onePingRound(mode, 0, stats.rounds, timeSpent, attempts);
     //Ping const resp2 = onePingRound(1, stats.rounds, timeSpent, attempts);
     //Ping const resp3 = onePingRound(2, stats.rounds, timeSpent, attempts);
 
 
     if (attempts < MAX_ATTEMPTS && timeSpent != -1)
     {
-      if (resp.header.transactionId && (resp.header.transactionId == stats.rounds))
+      if (success)
       {
         stats.ok++;
       }
