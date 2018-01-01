@@ -28,3 +28,5 @@ unsigned long micros()
 }
 unsigned long Arduino::timeNow = 0;
 unsigned long Arduino::timeStep = 1;
+
+TinyDebugSerial Serial;

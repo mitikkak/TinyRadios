@@ -1,0 +1,4 @@
+
+#pragma once
+
+const uint8_t led_server_address[5] = {0xAA, 0xBB, 0xCC, 0xDD, 0x0};

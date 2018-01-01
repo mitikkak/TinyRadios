@@ -22,12 +22,12 @@ TEST_F(TestLedNodeLoop, responsePeriodIsOn)
     RadioMode mode(300,300);
     TIME const timeNow = 0;
     TinyDebugSerial serial;
-    ledNodeLoopElse(radio, mode, timeNow, serial);
+    ledNodeLoopElse(radio, mode, transactionId, timeNow, serial);
     const uint8_t* const writeBuffer = radio.written();
     ASSERT_NE(nullptr, writeBuffer);
     const int respTransactionId = static_cast<int>(writeBuffer[sizeof(req.header.msgId)]);
     const int respMsgId = static_cast<int>(writeBuffer[0]);
-//    ASSERT_EQ(transactionId, respTransactionId);
+    ASSERT_EQ(transactionId, respTransactionId);
     ASSERT_EQ(PING_RESPONSE, respMsgId);
 }
 TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingReceived)

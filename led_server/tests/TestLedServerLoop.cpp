@@ -43,9 +43,10 @@ TEST_F(TestLedServerLoop, onePingRound_respReceivedOnFirstAttempt)
     unsigned int attempts = 0;
     bool const success = onePingRound(mode, receiver, transactionId, timeSpent, attempts);
     ASSERT_EQ(true, success);
-    const int respReceivedOnFirstAttempt = 1;
     const int causedByAdruinoStub = 1;
-    ASSERT_EQ(sendPeriod + respReceivedOnFirstAttempt + causedByAdruinoStub, timeSpent);
+    //const int respReceivedOnFirstAttempt = 1;
+    //ASSERT_EQ(sendPeriod + respReceivedOnFirstAttempt + causedByAdruinoStub, timeSpent);
+    ASSERT_EQ(sendPeriod + listenPeriod + causedByAdruinoStub, timeSpent);
 }
 TEST_F(TestLedServerLoop, onePingRound_noResp)
 {

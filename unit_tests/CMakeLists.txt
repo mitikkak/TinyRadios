@@ -31,7 +31,8 @@ set(shared_sources
    )
 set(stub_sources
     ${STUBS_SRC}/Arduino.cpp
-    ${STUBS_SRC}/RF24.cpp)
+    ${STUBS_SRC}/RF24.cpp
+   )
 
 add_definitions(-c -g -w -std=gnu++11)
 add_definitions(-Dnode_number=1)

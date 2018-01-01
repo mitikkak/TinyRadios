@@ -78,5 +78,4 @@ struct Ping
    Ping(const int i, const int t): header(i, t) {}
    Header header;
 };
-#include "RF24.h"
-void sendPingResponse(Ping const&  req, RF24& radio);
+

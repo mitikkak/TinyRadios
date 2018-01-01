@@ -33,47 +33,35 @@ struct Stats
 };
 Stats stats;
 const unsigned int MAX_ATTEMPTS = 10;
-#if 0
-Ping onePingRound(unsigned int const receiver, unsigned int const rounds, TIME& timeSpent, unsigned int& attempts)
-{
-    radio.openWritingPipe(remote_address[receiver]); // Write to device address '2Node'
-    TIME const timeStart = millis();
-    do
-    {
-      attempts++;
-      sendPingRequest(rounds);
-      #if 1
-      Ping const resp = getPingResponse();
-      if (resp.header.msgId == PING_RESPONSE)
-      {
-        Serial.println("resp: ");
-        timeSpent = millis()-timeStart;
-        return resp;
-      }
-      #else
-      timeSpent = millis()-timeStart;
-      return noResp;
-      #endif
-    }
-    while(attempts < MAX_ATTEMPTS);
-    return noResp;
-}
-#endif
 
 TIME prevLog = 0;
+int transactionId = 0;
 void loop()
 {
     TIME timeSpent = -1;
     unsigned int attempts = 0;
-    TIME const listenPeriod = 500;
-    TIME const sendPeriod = 500;
-    RadioMode mode(listenPeriod, sendPeriod);
-    bool const success = onePingRound(mode, 0, stats.rounds, timeSpent, attempts);
+    const int switchStatus = digitalRead(switchPin);
+    //if (switchStatus == LOW)
+    {
+        transactionId++;
+        TIME const listenPeriod = 1000;
+        TIME const sendPeriod = 100;
+        RadioMode mode(listenPeriod, sendPeriod);
+        bool const success1 = onePingRound(mode, 0, transactionId, timeSpent, attempts);
+        Serial.print("node 1 transactionId: "); Serial.print(transactionId);
+        Serial.print(", success: "); Serial.println(success1);
+        transactionId++;
+        bool const success2 = onePingRound(mode, 1, transactionId, timeSpent, attempts);
+        Serial.print("node 2 transactionId: "); Serial.print(transactionId);
+        Serial.print(", success: "); Serial.println(success2);
+        transactionId++;
+        bool const success3 = onePingRound(mode, 2, transactionId, timeSpent, attempts);
+        Serial.print("node 3 transactionId: "); Serial.print(transactionId);
+        Serial.print(", success: "); Serial.println(success3);
+    }
+#if 0
     //Ping const resp2 = onePingRound(1, stats.rounds, timeSpent, attempts);
     //Ping const resp3 = onePingRound(2, stats.rounds, timeSpent, attempts);
-
-
-    if (attempts < MAX_ATTEMPTS && timeSpent != -1)
     {
       if (success)
       {
@@ -97,4 +85,5 @@ void loop()
       Serial.print(", attempts: "); Serial.print(stats.attempts);
       Serial.print(", spent: "); Serial.println(stats.spent);
     }
+#endif
 }
