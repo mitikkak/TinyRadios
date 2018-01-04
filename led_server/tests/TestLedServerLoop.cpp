@@ -20,14 +20,14 @@ public:
 TEST_F(TestLedServerLoop, PingReq)
 {
     unsigned int const rounds = 5;
-    sendPingRequest(rounds);
+    sendLedRequest(rounds);
     ASSERT_EQ(radio.stoppedListening(), true);
     const uint8_t* const writeBuffer = radio.written();
     ASSERT_NE(nullptr, writeBuffer);
     Ping req(0, 0);
     const int trId = static_cast<int>(writeBuffer[sizeof(req.header.msgId)]);
     const int msgId = static_cast<int>(writeBuffer[0]);
-    ASSERT_EQ(PING_REQUEST, msgId);
+    ASSERT_EQ(LED_REQUEST, msgId);
     ASSERT_EQ(trId, rounds);
 }
 TEST_F(TestLedServerLoop, onePingRound_respReceivedOnFirstAttempt)

@@ -4,10 +4,10 @@
 #include "shared/Messages.h"
 #include "Loop.h"
 
-void sendPingRequest(unsigned int const rounds)
+void sendLedRequest(unsigned int const transactionId)
 {
   radio.stopListening();
-  Ping request(PING_REQUEST, rounds);
+  LedRequest request(transactionId);
   radio.write( &request, sizeof(request) );
 }
 bool getPingResponse(Ping& resp)
@@ -38,7 +38,7 @@ bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int con
     int numSent = 0;
     while(!mode.swap(timeNow, false))
     {
-        sendPingRequest(transactionId);
+        sendLedRequest(transactionId);
         timeNow = millis();
         numSent++;
     }

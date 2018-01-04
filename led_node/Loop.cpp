@@ -42,11 +42,10 @@ void sendPingResponse(Ping const&  resp, RF24& radio)
   //Ping resp(PING_RESPONSE, req.header.transactionId);
   radio.write( &resp, sizeof(resp) );
 }
-Ping getPingRequest(TinyDebugSerial& _SERIAL)
+LedRequest getLedRequest()
 {
   radio.startListening();
-  bool timeout = false;
-  Ping req(0,0);
+  LedRequest req(0);
   if (radio.available())
   {
     radio.read( &req, sizeof(req) );
@@ -55,9 +54,9 @@ Ping getPingRequest(TinyDebugSerial& _SERIAL)
 }
 int ledNodeLoopIf(RadioMode& mode, TIME const timeNow, TinyDebugSerial& _SERIAL)
 {
-    Ping const req = getPingRequest(_SERIAL);
+    LedRequest const req = getLedRequest();
     bool reqReceived = false;
-    if (req.header.msgId == PING_REQUEST)
+    if (req.header.msgId == LED_REQUEST)
     {
 //      if (!connectionEstablished)
 //      {

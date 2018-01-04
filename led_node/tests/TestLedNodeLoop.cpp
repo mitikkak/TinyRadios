@@ -32,7 +32,7 @@ TEST_F(TestLedNodeLoop, responsePeriodIsOn)
 }
 TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingReceived)
 {
-    const int msgId = PING_REQUEST;
+    const int msgId = LED_REQUEST;
     radio.setMsgId(msgId);
     TIME const timeNow = 6;
     TinyDebugSerial serial;

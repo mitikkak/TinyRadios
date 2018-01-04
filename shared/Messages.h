@@ -27,10 +27,10 @@ enum LedLevel
     Led_MEDIUM = 2,
     Led_HIGH = 3
 };
-struct Request
+struct LedRequest
 {
-    Request(): header(0,0){}
-    Request(const int msgId): header(msgId,0), led(Led_OFF){}
+    LedRequest(): header(0,0){}
+    LedRequest(const int trId): header(LED_REQUEST,trId), led(Led_OFF){}
     Header header;
     LedLevel led;
 };
