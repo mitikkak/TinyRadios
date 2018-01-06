@@ -13,7 +13,7 @@ public:
     }
 
     void TearDown() {
-
+        RF24::readFunctionPtr = 0;
     }
 };
 

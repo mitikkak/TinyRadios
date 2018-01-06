@@ -20,6 +20,9 @@ public:
     {
         delete[] writeBuffer;
     }
+    typedef void (*ReadFunctionType)(void* handle, unsigned const size);
+    static ReadFunctionType readFunctionPtr;
+
     void startListening()
     {
         started = true;

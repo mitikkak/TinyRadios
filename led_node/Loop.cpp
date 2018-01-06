@@ -64,7 +64,8 @@ int ledNodeLoopIf(RadioMode& mode, TIME const timeNow, TinyDebugSerial& _SERIAL)
 //      }
       //blinker.update(timeNow);
 //      connectionEstablished = true;
-      digitalWrite(ledPin, HIGH);
+      const int ledState = (req.led == Led_OFF) ? LOW : HIGH;
+      digitalWrite(ledPin, ledState);
       reqReceived = true;
     }
     if (mode.swap(timeNow, reqReceived))

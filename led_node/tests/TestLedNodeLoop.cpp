@@ -6,12 +6,67 @@
 class TestLedNodeLoop : public ::testing::Test {
 public:
 
+    static int& msgId()
+    {
+        static int s_msgId = 0;
+        return s_msgId;
+    }
+
+    static int& trId()
+    {
+        static int s_trId = 0;
+        return s_trId;
+    }
+
+    static LedLevel& level()
+    {
+        static LedLevel s_level = Led_OFF;
+        return s_level;
+    }
+
     void SetUp() {
         Arduino::reset();
     }
 
     void TearDown() {
+        RF24::readFunctionPtr = 0;
+    }
 
+    static void ledRequestReader(void* handle, unsigned const size)
+    {
+        LedRequest* req = static_cast<LedRequest*>(handle);
+        req->header.msgId = msgId();
+        req->header.transactionId = trId();
+        req->led = level();
+    }
+
+    void setLedRequestReader(int msgId_, int trId_, LedLevel level_)
+    {
+        msgId() = msgId_;
+        trId() = trId_;
+        level() = level_;
+        RF24::readFunctionPtr = &ledRequestReader;
+    }
+    void sequenceLedReqReceived(LedLevel const ledLevel, const int ledState)
+    {
+        Arduino::reset();
+        const int msgId = LED_REQUEST;
+        radio.setMsgId(msgId);
+        TIME const timeNow = 6;
+        TinyDebugSerial serial;
+        const int expectedTransactionId = 98;
+        setLedRequestReader(msgId, expectedTransactionId, ledLevel);
+        ASSERT_EQ("", serial.getPrints());
+        ASSERT_EQ(LOW, Arduino::ledState(ledPin));
+        RadioMode mode(300,300);
+        mode.start(RadioMode::listening, timeNow);
+        ASSERT_EQ(RadioMode::listening, mode.state());
+        const int transactionId = ledNodeLoopIf(mode, timeNow, serial);
+        std::string const expectedLog = std::string(std::to_string(timeNow)) + ", reqs: 1";
+        ASSERT_EQ(expectedTransactionId, transactionId);
+        ASSERT_EQ(expectedLog, serial.getPrints());
+        ASSERT_EQ(ledState, Arduino::ledState(ledPin));
+        ASSERT_EQ(RadioMode::sending, mode.state());
     }
 };
 
@@ -30,22 +85,13 @@ TEST_F(TestLedNodeLoop, responsePeriodIsOn)
     ASSERT_EQ(transactionId, respTransactionId);
     ASSERT_EQ(PING_RESPONSE, respMsgId);
 }
-TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingReceived)
+TEST_F(TestLedNodeLoop, listeningPeriodIdOn_LedReqReceived)
 {
-    const int msgId = LED_REQUEST;
-    radio.setMsgId(msgId);
-    TIME const timeNow = 6;
-    TinyDebugSerial serial;
-    ASSERT_EQ("", serial.getPrints());
-    ASSERT_EQ(LOW, Arduino::ledState(ledPin));
-    RadioMode mode(300,300);
-    mode.start(RadioMode::listening, timeNow);
-    ASSERT_EQ(RadioMode::listening, mode.state());
-    ledNodeLoopIf(mode, timeNow, serial);
-    std::string const expectedLog = std::string(std::to_string(timeNow)) + ", reqs: 1";
-    ASSERT_EQ(expectedLog, serial.getPrints());
-    ASSERT_EQ(HIGH, Arduino::ledState(ledPin));
-    ASSERT_EQ(RadioMode::sending, mode.state());
+    sequenceLedReqReceived(Led_OFF, LOW);
+    sequenceLedReqReceived(Led_LOW, HIGH);
+    sequenceLedReqReceived(Led_MEDIUM, HIGH);
+    sequenceLedReqReceived(Led_HIGH, HIGH);
+    sequenceLedReqReceived(Led_OFF, LOW);
 }
 TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingNotReceived)
 {
