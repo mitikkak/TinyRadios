@@ -8,12 +8,12 @@ void loop() {
     TIME const timeNow = millis();
     if (RadioMode::listening == mode.state())
     {
-        transactionId = ledNodeLoopIf(mode, timeNow, _SERIAL);
+        transactionId = ledNodeLoopIf(mode, timeNow);
     }
     else
     {
         //digitalWrite(sendIndicator, HIGH);
-        ledNodeLoopElse(radio, mode, transactionId, timeNow, _SERIAL);
+        ledNodeLoopElse(radio, mode, transactionId, timeNow);
     }
 }
 #else
@@ -26,7 +26,7 @@ void ledNodeLoop()
 {
 
 }
-void ledNodeLoopElse(RF24& radio, RadioMode& mode, const int transactionId, TIME const timeNow, TinyDebugSerial& _SERIAL)
+void ledNodeLoopElse(RF24& radio, RadioMode& mode, const int transactionId, TIME const timeNow)
 {
     if (mode.swap(timeNow, false))
     {
@@ -52,7 +52,7 @@ LedRequest getLedRequest()
   }
   return req;
 }
-int ledNodeLoopIf(RadioMode& mode, TIME const timeNow, TinyDebugSerial& _SERIAL)
+int ledNodeLoopIf(RadioMode& mode, TIME const timeNow)
 {
     LedRequest const req = getLedRequest();
     bool reqReceived = false;

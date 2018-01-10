@@ -61,7 +61,7 @@ public:
         RadioMode mode(300,300);
         mode.start(RadioMode::listening, timeNow);
         ASSERT_EQ(RadioMode::listening, mode.state());
-        const int transactionId = ledNodeLoopIf(mode, timeNow, serial);
+        const int transactionId = ledNodeLoopIf(mode, timeNow);
         std::string const expectedLog = std::string(std::to_string(timeNow)) + ", reqs: 1";
         ASSERT_EQ(expectedTransactionId, transactionId);
         ASSERT_EQ(expectedLog, serial.getPrints());
@@ -77,7 +77,7 @@ TEST_F(TestLedNodeLoop, responsePeriodIsOn)
     RadioMode mode(300,300);
     TIME const timeNow = 0;
     TinyDebugSerial serial;
-    ledNodeLoopElse(radio, mode, transactionId, timeNow, serial);
+    ledNodeLoopElse(radio, mode, transactionId, timeNow);
     const uint8_t* const writeBuffer = radio.written();
     ASSERT_NE(nullptr, writeBuffer);
     const int respTransactionId = static_cast<int>(writeBuffer[sizeof(req.header.msgId)]);
@@ -101,7 +101,7 @@ TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingNotReceived)
     TinyDebugSerial serial;
     RadioMode mode(300,300);
     mode.start(RadioMode::listening, timeNow);
-    ledNodeLoopIf(mode, timeNow, serial);
+    ledNodeLoopIf(mode, timeNow);
     std::string const expectedLog = "";
     ASSERT_EQ(expectedLog, serial.getPrints());
     ASSERT_EQ(LOW, Arduino::ledState(ledPin));

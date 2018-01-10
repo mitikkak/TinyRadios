@@ -5,8 +5,8 @@
 
 void setup()
 {
-    Serial.begin(9600);
-    Serial.println("begin");
+    _SERIAL.begin(9600);
+    _SERIAL.println("begin");
     radio.begin(); // Start up the radio
 
     radio.setAutoAck(1); // Ensure autoACK is enabled

@@ -31,8 +31,8 @@ void loop()
         TIME const sendPeriod = 100;
         RadioMode mode(listenPeriod, sendPeriod);
         bool const success = onePingRound(mode, node, transactionId, timeSpent, attempts);
-        Serial.print("node "); Serial.print(node); Serial.print("transactionId: "); Serial.print(transactionId);
-        Serial.print(", success: "); Serial.println(success);
+        _SERIAL.print("node "); _SERIAL.print(node); _SERIAL.print("transactionId: "); _SERIAL.print(transactionId);
+        _SERIAL.print(", success: "); _SERIAL.println(success);
         if (success)
         {
             node = (node < 2) ? node+1 : 0;

@@ -1,12 +1,16 @@
 #pragma once
 
 #include "Arduino.h"
-#include "TinyDebugSerial.h"
 #include "RF24.h"
 #include "Messages.h"
 #include "RadioMode.h"
 
+#ifdef ARDUINO_attiny
+#include "TinyDebugSerial.h"
 extern TinyDebugSerial _SERIAL;
+#else
+#define _SERIAL Serial
+#endif
 extern RF24 radio;
 extern RadioMode mode;
 const int ledPin = 4;

@@ -30,7 +30,7 @@ uint8_t remote_address[3][5] = {
 };
 bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int const transactionId, TIME& timeSpent, unsigned int& attempts)
 {
-    Serial.println("onePingRound");
+    _SERIAL.println("onePingRound");
     radio.openWritingPipe(remote_address[receiver]);
     TIME timeNow = millis();
     TIME const startTime = timeNow;
@@ -42,7 +42,7 @@ bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int con
         timeNow = millis();
         numSent++;
     }
-    Serial.println(numSent);
+    _SERIAL.println(numSent);
     bool respReceived = false;
     Ping resp(0,0);
     while(!mode.swap(timeNow, respReceived))
