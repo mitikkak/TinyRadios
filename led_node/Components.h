@@ -4,6 +4,7 @@
 #include "RF24.h"
 #include "Messages.h"
 #include "RadioMode.h"
+#include "shared/RadioPins.h"
 
 #ifdef ARDUINO_attiny
 #include "TinyDebugSerial.h"
@@ -15,10 +16,6 @@ extern RF24 radio;
 extern RadioMode mode;
 const int ledPin = 4;
 //const int sendIndicator = 3;
-
-// dependent on RF24's tiny85 specific 3pin -feature
-#define CE_PIN 9
-#define CSN_PIN CE_PIN
 
 #ifndef node_number
     #error "node_number not available! Check your build system."
