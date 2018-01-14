@@ -11,3 +11,5 @@ add_executable(${PROJECT_NAME} ${sources} ${shared_sources} ${arduino_core_sourc
 add_custom_target(elf_to_hex_led_server COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avr-objcopy -O ihex -R .eeprom led_server led_server.hex)
 add_custom_target(upload_led_server COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avrdude -C${ARDUINO_PATH}/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino -P/dev/ttyACM0 -b115200 -Uflash:w:./led_server.hex:i
                                     DEPENDS elf_to_hex_led_server)
+add_custom_target(upload_led_server_1 COMMAND ${ARDUINO_PATH}/hardware/tools/avr/bin/avrdude -C${ARDUINO_PATH}/hardware/tools/avr/etc/avrdude.conf -v -patmega328p -carduino -P/dev/ttyACM1 -b115200 -Uflash:w:./led_server.hex:i
+                                      DEPENDS elf_to_hex_led_server)

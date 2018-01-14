@@ -14,7 +14,11 @@ extern TinyDebugSerial _SERIAL;
 #endif
 extern RF24 radio;
 extern RadioMode mode;
-const int ledPin = 4;
+#ifdef ARDUINO_attiny
+static const int ledPin = 4;
+#else
+static const int ledPin = A0;
+#endif
 //const int sendIndicator = 3;
 
 #ifndef node_number
