@@ -1068,7 +1068,9 @@ private:
    *
    * @return Current value of status register
    */
+public:
   uint8_t flush_rx(void);
+private:
 
   /**
    * Retrieve the current status of the chip

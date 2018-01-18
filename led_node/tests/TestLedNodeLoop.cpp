@@ -18,9 +18,9 @@ public:
         return s_trId;
     }
 
-    static LedLevel& level()
+    static int& level()
     {
-        static LedLevel s_level = Led_OFF;
+        static int s_level = Led_OFF;
         return s_level;
     }
 
@@ -35,22 +35,21 @@ public:
     static void ledRequestReader(void* handle, unsigned const size)
     {
         LedRequest* req = static_cast<LedRequest*>(handle);
-        req->header.msgId = msgId();
-        req->header.transactionId = trId();
-        req->led = level();
+        req->setMsgId(msgId());
+        req->setTrId(trId());
     }
 
-    void setLedRequestReader(int msgId_, int trId_, LedLevel level_)
+    void setLedRequestReader(int msgId_, int trId_, int level_)
     {
         msgId() = msgId_;
         trId() = trId_;
         level() = level_;
         RF24::readFunctionPtr = &ledRequestReader;
     }
-    void sequenceLedReqReceived(LedLevel const ledLevel, const int ledState)
+    void sequenceLedReqReceived(int const ledLevel, const int ledState)
     {
         Arduino::reset();
-        const int msgId = LED_REQUEST;
+        const int msgId = LED_ON_REQUEST;
         radio.setMsgId(msgId);
         TIME const timeNow = 6;
         TinyDebugSerial serial;
@@ -88,10 +87,7 @@ TEST_F(TestLedNodeLoop, responsePeriodIsOn)
 TEST_F(TestLedNodeLoop, listeningPeriodIdOn_LedReqReceived)
 {
     sequenceLedReqReceived(Led_OFF, LOW);
-    sequenceLedReqReceived(Led_LOW, HIGH);
-    sequenceLedReqReceived(Led_MEDIUM, HIGH);
-    sequenceLedReqReceived(Led_HIGH, HIGH);
-    sequenceLedReqReceived(Led_OFF, LOW);
+    sequenceLedReqReceived(Led_ON, HIGH);
 }
 TEST_F(TestLedNodeLoop, listeningPeriodIdOn_PingNotReceived)
 {

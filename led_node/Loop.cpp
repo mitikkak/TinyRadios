@@ -30,7 +30,7 @@ void ledNodeLoopElse(RF24& radio, RadioMode& mode, const int transactionId, TIME
 {
     if (mode.swap(timeNow, false))
     {
-        _SERIAL.println("end of sending period");
+        _SERIAL.println("tr: "); _SERIAL.println(transactionId);
         return;
     }
     const Ping resp(PING_RESPONSE, transactionId);
@@ -45,10 +45,11 @@ void sendPingResponse(Ping const&  resp, RF24& radio)
 LedRequest getLedRequest()
 {
   radio.startListening();
-  LedRequest req(0);
+  LedRequest req(0, -1);
   if (radio.available())
   {
     radio.read( &req, sizeof(req) );
+    _SERIAL.println(req.get());
   }
   return req;
 }
@@ -56,7 +57,7 @@ int ledNodeLoopIf(RadioMode& mode, TIME const timeNow)
 {
     LedRequest const req = getLedRequest();
     bool reqReceived = false;
-    if (req.header.msgId == LED_REQUEST)
+    if (req.msgId() == LED_ON_REQUEST)
     {
 //      if (!connectionEstablished)
 //      {
@@ -64,17 +65,24 @@ int ledNodeLoopIf(RadioMode& mode, TIME const timeNow)
 //      }
       //blinker.update(timeNow);
 //      connectionEstablished = true;
-      const int ledState = (req.led == Led_OFF) ? LOW : HIGH;
-      digitalWrite(ledPin, ledState);
+      _SERIAL.println("LED ON");
+      digitalWrite(ledPin, HIGH);
       reqReceived = true;
+    }
+    else if (req.msgId() == LED_OFF_REQUEST)
+    {
+        _SERIAL.println("LED OFF");
+        digitalWrite(ledPin, LOW);
+        reqReceived = true;
     }
     if (mode.swap(timeNow, reqReceived))
     {
-        _SERIAL.print(timeNow);
-        _SERIAL.print(", reqs: "); _SERIAL.println(1);
+        //_SERIAL.print(timeNow);
+        //_SERIAL.print("trId: "); _SERIAL.println(req.header.transactionId);
         //connectionEstablished = false;
         //digitalWrite(ledPin, LOW);
+        radio.flush_rx();
     }
-    return req.header.transactionId;
+    return req.get();
 }
 

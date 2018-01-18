@@ -4,10 +4,11 @@
 #include "shared/Messages.h"
 #include "Loop.h"
 
-void sendLedRequest(unsigned int const transactionId)
+void sendLedRequest(unsigned int const transactionId, int const msgId)
 {
   radio.stopListening();
-  LedRequest request(transactionId);
+  LedRequest request(msgId, transactionId);
+  _SERIAL.println(request.get(), HEX);
   radio.write( &request, sizeof(request) );
 }
 bool getPingResponse(Ping& resp)
@@ -28,9 +29,9 @@ uint8_t remote_address[3][5] = {
   {0xAA, 0xBB, 0xCC, 0xDD, 0x2},
   {0xAA, 0xBB, 0xCC, 0xDD, 0x3}
 };
-bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int const transactionId, TIME& timeSpent, unsigned int& attempts)
+bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int const transactionId, TIME& timeSpent, unsigned int& respTrId, int const msgId)
 {
-    _SERIAL.println("onePingRound");
+    //_SERIAL.println("onePingRound");
     radio.openWritingPipe(remote_address[receiver]);
     TIME timeNow = millis();
     TIME const startTime = timeNow;
@@ -38,18 +39,19 @@ bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int con
     int numSent = 0;
     while(!mode.swap(timeNow, false))
     {
-        sendLedRequest(transactionId);
+        sendLedRequest(transactionId, msgId);
         timeNow = millis();
         numSent++;
     }
-    _SERIAL.println(numSent);
+    //_SERIAL.println(numSent);
     bool respReceived = false;
-    Ping resp(0,0);
+    Ping resp(0,-1);
     while(!mode.swap(timeNow, respReceived))
     {
         /*respReceived =*/ getPingResponse(resp);
         timeNow = millis();
     }
     timeSpent = millis() - startTime;
-    return (resp.header.msgId == PING_RESPONSE) && (resp.header.transactionId == transactionId);
+    respTrId = resp.header.transactionId;
+    return (resp.header.msgId == PING_RESPONSE) /*&& (resp.header.transactionId == transactionId)*/;
 }
