@@ -1,9 +1,9 @@
 
 project(led_node)
 
-include(${PROJECT_ROOT}/tiny85_defs.cmake)
+include(${ARDUINO_CMAKE_DIR}/tiny85_defs.cmake)
 
-include(${PROJECT_ROOT}/arduino_tools.cmake)
+include(${ARDUINO_CMAKE_DIR}/arduino_tools.cmake)
 
 add_executable(${PROJECT_NAME} ${sources} ${shared} ${arduino_core_sources} ${tiny_dbg_serial_sources} ${rf24_sources})
 

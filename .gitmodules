@@ -1,0 +1,3 @@
+[submodule "arduino_cmake"]
+	path = arduino_cmake
+	url = https://github.com/mitikkak/arduino_cmake.git

@@ -2,9 +2,9 @@
 project(led_node_atmega)
 
 INCLUDE_DIRECTORIES(${ARDUINO_PINS} ${ARDUINO_SPI_SRC})
-include(${PROJECT_ROOT}/arduino_tools.cmake)
+include(${ARDUINO_CMAKE_DIR}/arduino_tools.cmake)
 
-include(${PROJECT_ROOT}/atmega328_defs.cmake)
+include(${ARDUINO_CMAKE_DIR}/atmega328_defs.cmake)
 
 add_executable(${PROJECT_NAME} ${sources} ${shared} ${arduino_core_sources} ${rf24_sources} ${spi_sources})
 
