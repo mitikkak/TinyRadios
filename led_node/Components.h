@@ -26,5 +26,5 @@ static const int ledPin = A0;
 #endif
 
 static constexpr char node_id{node_number};
-const uint8_t my_address[5] = {0xAA, 0xBB, 0xCC, 0xDD, node_id};
+//const uint8_t my_address[5] = {0xAA, 0xBB, 0xCC, 0xDD, node_id};
 

@@ -1,6 +1,7 @@
 
 #include "led_node/Loop.h"
 #include "led_node/Components.h"
+#include "shared/Addresses.h"
 
 #ifndef NODE_ALWAYS_ON
 int transactionId = 0;
@@ -31,6 +32,7 @@ void ledNodeLoopElse(RF24& radio, RadioMode& mode, const int transactionId, TIME
     if (mode.swap(timeNow, false))
     {
         _SERIAL.println("tr: "); _SERIAL.println(transactionId);
+        radio.startListening();
         return;
     }
     const Ping resp(PING_RESPONSE, transactionId);
@@ -38,13 +40,11 @@ void ledNodeLoopElse(RF24& radio, RadioMode& mode, const int transactionId, TIME
 }
 void sendPingResponse(Ping const&  resp, RF24& radio)
 {
-  radio.stopListening();
   //Ping resp(PING_RESPONSE, req.header.transactionId);
   radio.write( &resp, sizeof(resp) );
 }
 LedRequest getLedRequest()
 {
-  radio.startListening();
   LedRequest req(0, -1);
   if (radio.available())
   {
@@ -82,6 +82,9 @@ int ledNodeLoopIf(RadioMode& mode, TIME const timeNow)
         //connectionEstablished = false;
         //digitalWrite(ledPin, LOW);
         radio.flush_rx();
+        int receiver = (node_number < maxNumberOfNodes) ? node_number : 0;
+        radio.stopListening();
+        radio.openWritingPipe(led_server_addresses[receiver]); // Write to device address '2Node'
     }
     return req.get();
 }

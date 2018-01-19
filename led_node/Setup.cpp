@@ -10,14 +10,21 @@ void setup() {
   int const beginStatus = radio.begin(); // Start up the radio
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15,15); // Max delay between retries & number of retries
-  radio.openWritingPipe(led_server_address); // Write to device address '2Node'
-  radio.openReadingPipe(1,my_address); // Read on pipe 1 for device address '1Node'
+  if (node_id < maxNumberOfNodes)
+  {
+      radio.openReadingPipe(0,led_node_addresses[node_id]);
+  }
+  else
+  {
+      _SERIAL.print("node_id failure:"); _SERIAL.println(node_id);
+  }
   radio.setPALevel(RF24_PA_LOW);
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
   //pinMode(sendIndicator, OUTPUT);
   //doBlink(3, 300);
   mode.start(RadioMode::listening, millis());
+  radio.startListening();
 }
 #else
 void setup()
