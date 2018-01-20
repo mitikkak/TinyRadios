@@ -82,7 +82,7 @@ int ledNodeLoopIf(RadioMode& mode, TIME const timeNow)
         //connectionEstablished = false;
         //digitalWrite(ledPin, LOW);
         radio.flush_rx();
-        int receiver = (node_number < maxNumberOfNodes) ? node_number : 0;
+        const int receiver = (node_idx < maxNumberOfNodes) ? node_idx : 0;
         radio.stopListening();
         radio.openWritingPipe(led_server_addresses[receiver]); // Write to device address '2Node'
     }

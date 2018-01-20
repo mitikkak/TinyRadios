@@ -10,7 +10,7 @@ void setup() {
   int const beginStatus = radio.begin(); // Start up the radio
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15,15); // Max delay between retries & number of retries
-  if (node_id < maxNumberOfNodes)
+  if (node_idx < maxNumberOfNodes)
   {
       radio.openReadingPipe(0,led_node_addresses[node_id]);
   }
