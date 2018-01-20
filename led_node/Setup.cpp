@@ -10,13 +10,13 @@ void setup() {
   int const beginStatus = radio.begin(); // Start up the radio
   radio.setAutoAck(1); // Ensure autoACK is enabled
   radio.setRetries(15,15); // Max delay between retries & number of retries
-  if (node_idx < maxNumberOfNodes)
+  if ((node_idx < maxNumberOfNodes) && (node_idx >= 0))
   {
-      radio.openReadingPipe(0,led_node_addresses[node_id]);
+      radio.openReadingPipe(0,led_node_addresses[node_idx]);
   }
   else
   {
-      _SERIAL.print("node_id failure:"); _SERIAL.println(node_id);
+      _SERIAL.print("node_idx failure:"); _SERIAL.println(node_idx);
   }
   radio.setPALevel(RF24_PA_LOW);
   pinMode(ledPin, OUTPUT);

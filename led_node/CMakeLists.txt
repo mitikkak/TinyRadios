@@ -2,6 +2,7 @@
 set(LED_NODE_SRC ${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${ARDUINO_CORE_SRC} ${SHARED_SRC} ${PROJECT_ROOT} ${ARDUINO_WIRE_SRC}  ${RF24_SRC} ${MESSAGES_SRC})
 set(node_number 1 CACHE STRING "node number of led node")
+message("-- Node number set as " ${node_number})
 add_definitions(-Dnode_number=${node_number})
 #add_definitions(-DNODE_ALWAYS_ON)
 set(sources ${LED_NODE_SRC}/Loop.cpp

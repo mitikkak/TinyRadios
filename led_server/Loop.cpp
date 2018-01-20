@@ -44,11 +44,11 @@ void loop()
         _SERIAL.print(", success: "); _SERIAL.println(success);
         if (success)
         {
-//            if (node < 2)
-//            {
-//                node++;
-//            }
-//            else
+            if (node < 2)
+            {
+                node++;
+            }
+            else
             {
                 node = 0;
                 msgId = (msgId == LED_ON_REQUEST) ? LED_OFF_REQUEST : LED_ON_REQUEST;
