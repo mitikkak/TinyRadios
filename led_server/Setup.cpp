@@ -5,6 +5,9 @@
 
 void setup()
 {
+#ifdef BLUETOOTH_ON
+      _BLUETOOTH.begin(9600);
+#endif
     _SERIAL.begin(9600);
     _SERIAL.println("begin");
     radio.begin(); // Start up the radio

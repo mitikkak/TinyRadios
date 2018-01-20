@@ -4,6 +4,61 @@
 #include "shared/Messages.h"
 #include "Loop.h"
 
+#ifdef BLUETOOTH_ON
+int counter = 0;
+const String resp = "RESP:";
+boolean ledon = false;
+void ledOn()
+{
+  //digitalWrite(led, HIGH);
+  //delay(10);
+}
+void ledOff()
+{
+  //digitalWrite(led, LOW);
+  //delay(10);
+}
+void loop()
+{
+  String string = "";
+  while(_BLUETOOTH.available() > 0)
+  {
+    char const command = ((byte)_BLUETOOTH.read());
+    if(command == ':')
+    {
+      break;
+    }
+    else
+    {
+      string += command;
+    }
+    delay(1);
+  }
+  if (string == "") {return;}
+
+  Serial.println(string);
+  if(string == "TO")
+  {
+    counter++;
+    char cnt_str_buffer[10] = {0};
+    itoa(counter, cnt_str_buffer, 10);
+    resp += cnt_str_buffer;
+    resp += ";";
+
+    _BLUETOOTH.print(resp + "#"); //debug
+    ledOn();
+    ledon = true;
+  }
+  if(string =="TF")
+  {
+     counter = 0;
+     resp = "RESP:";
+     ledOff();
+     ledon = false;
+  }
+
+}
+#else
 struct Stats
 {
   Stats(): rounds(0), attempts(0), ok(0), spent(0) {}
@@ -23,14 +78,6 @@ int msgId = LED_ON_REQUEST;
 void loop()
 {
     TIME timeSpent = -1;
-   #if 0
-    const int switchStatus = digitalRead(switchPin);
-    if (switchStatus == LOW)
-    {
-        msgId = (msgId == LED_ON_REQUEST) ? LED_OFF_REQUEST : LED_ON_REQUEST;
-        _SERIAL.print("msgId: "); Serial.println(msgId);
-    }
-#endif
     {
         transactionId++;
         TIME const listenPeriod = 1000;
@@ -57,3 +104,4 @@ void loop()
         }
     }
 }
+#endif

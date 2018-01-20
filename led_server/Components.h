@@ -11,3 +11,8 @@ extern TinyDebugSerial _SERIAL;
 #else
 #define _SERIAL Serial
 #endif
+
+#ifdef BLUETOOTH_ON
+#include "SoftwareSerial.h"
+extern SoftwareSerial _BLUETOOTH;
+#endif
