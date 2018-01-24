@@ -4,17 +4,53 @@
 #include "shared/Messages.h"
 #include "Loop.h"
 
+TIME prevLog = 0;
+int transactionId = 0;
+int node = 0;
+int msgId = LED_ON_REQUEST;
+void orderOneNode()
+{
+    TIME timeSpent = -1;
+    transactionId++;
+    TIME const listenPeriod = 1000;
+    TIME const sendPeriod = 100;
+    RadioMode mode(listenPeriod, sendPeriod);
+    unsigned int respTrId = 0;
+
+    bool const success = onePingRound(mode, node, transactionId, timeSpent, respTrId, msgId);
+    _SERIAL.print("node "); _SERIAL.print(node); _SERIAL.print("transactionId: "); _SERIAL.print(transactionId);
+    _SERIAL.print("/");_SERIAL.print(respTrId);
+    _SERIAL.print(", success: "); _SERIAL.println(success);
+    if (success)
+    {
+        if (node < 2)
+        {
+            node++;
+        }
+        else
+        {
+            node = 0;
+            msgId = (msgId == LED_ON_REQUEST) ? LED_OFF_REQUEST : LED_ON_REQUEST;
+        }
+
+    }
+}
+
 #ifdef BLUETOOTH_ON
 int counter = 0;
-const String resp = "RESP:";
+String resp = "RESP:";
 boolean ledon = false;
 void ledOn()
 {
+  Serial.println("led on");
+  orderOneNode();
   //digitalWrite(led, HIGH);
   //delay(10);
 }
 void ledOff()
 {
+  Serial.println("led off");
+  orderOneNode();
   //digitalWrite(led, LOW);
   //delay(10);
 }
@@ -71,37 +107,10 @@ struct Stats
 Stats stats;
 const unsigned int MAX_ATTEMPTS = 10;
 
-TIME prevLog = 0;
-int transactionId = 0;
-int node = 0;
-int msgId = LED_ON_REQUEST;
 void loop()
 {
-    TIME timeSpent = -1;
     {
-        transactionId++;
-        TIME const listenPeriod = 1000;
-        TIME const sendPeriod = 100;
-        RadioMode mode(listenPeriod, sendPeriod);
-        unsigned int respTrId = 0;
-
-        bool const success = onePingRound(mode, node, transactionId, timeSpent, respTrId, msgId);
-        _SERIAL.print("node "); _SERIAL.print(node); _SERIAL.print("transactionId: "); _SERIAL.print(transactionId);
-        _SERIAL.print("/");_SERIAL.print(respTrId);
-        _SERIAL.print(", success: "); _SERIAL.println(success);
-        if (success)
-        {
-            if (node < 2)
-            {
-                node++;
-            }
-            else
-            {
-                node = 0;
-                msgId = (msgId == LED_ON_REQUEST) ? LED_OFF_REQUEST : LED_ON_REQUEST;
-            }
-
-        }
+        orderOneNode();
     }
 }
 #endif
