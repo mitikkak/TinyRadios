@@ -3,12 +3,13 @@
 #include "Components.h"
 #include "shared/Messages.h"
 #include "Loop.h"
+#include "shared/Addresses.h"
 
 TIME prevLog = 0;
 int transactionId = 0;
-int node = 0;
-int msgId = LED_ON_REQUEST;
-void orderOneNode()
+//int node = 0;
+int msgIdTable[maxNumberOfNodes] = {LED_ON_REQUEST, LED_ON_REQUEST, LED_ON_REQUEST};
+void orderOneNode(const int node = 0)
 {
     TIME timeSpent = -1;
     transactionId++;
@@ -16,29 +17,18 @@ void orderOneNode()
     TIME const sendPeriod = 100;
     RadioMode mode(listenPeriod, sendPeriod);
     unsigned int respTrId = 0;
-
+    int& msgId = msgIdTable[node];
     bool const success = onePingRound(mode, node, transactionId, timeSpent, respTrId, msgId);
     _SERIAL.print("node "); _SERIAL.print(node); _SERIAL.print("transactionId: "); _SERIAL.print(transactionId);
     _SERIAL.print("/");_SERIAL.print(respTrId);
     _SERIAL.print(", success: "); _SERIAL.println(success);
     if (success)
     {
-        if (node < 2)
-        {
-            node++;
-        }
-        else
-        {
-            node = 0;
-            msgId = (msgId == LED_ON_REQUEST) ? LED_OFF_REQUEST : LED_ON_REQUEST;
-        }
-
+        msgId = (msgId == LED_ON_REQUEST) ? LED_OFF_REQUEST : LED_ON_REQUEST;
     }
 }
 
 #ifdef BLUETOOTH_ON
-int counter = 0;
-String resp = "RESP:";
 boolean ledon = false;
 void ledOn()
 {
@@ -53,6 +43,11 @@ void ledOff()
   orderOneNode();
   //digitalWrite(led, LOW);
   //delay(10);
+}
+void toggleLed(const int node_idx)
+{
+  Serial.print("toggle led: "); Serial.println(node_idx);
+  orderOneNode(node_idx);
 }
 void loop()
 {
@@ -73,24 +68,26 @@ void loop()
   if (string == "") {return;}
 
   Serial.println(string);
-  if(string == "TO")
+  if(string == "SC")
   {
-    counter++;
-    char cnt_str_buffer[10] = {0};
-    itoa(counter, cnt_str_buffer, 10);
-    resp += cnt_str_buffer;
-    resp += ";";
-
-    _BLUETOOTH.print(resp + "#"); //debug
-    ledOn();
-    ledon = true;
+      String resp = "RESP:";
+      for (unsigned node = 0; node < maxNumberOfNodes; node++)
+      {
+        char cnt_str_buffer[10] = {0};
+        itoa(node, cnt_str_buffer, 10);
+        resp += cnt_str_buffer;
+        resp += ";";
+      }
+      _BLUETOOTH.print(resp + "#");
   }
-  if(string =="TF")
+  else if(string =="CL")
   {
-     counter = 0;
-     resp = "RESP:";
-     ledOff();
-     ledon = false;
+  }
+  else if (string.substring(0, 3) == "LED")
+  {
+      Serial.println(string.substring(3));
+      int const node = string.substring(3).toInt();
+      toggleLed(node);
   }
 
 }
