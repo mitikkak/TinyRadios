@@ -16,3 +16,6 @@ extern TinyDebugSerial _SERIAL;
 #include "SoftwareSerial.h"
 extern SoftwareSerial _BLUETOOTH;
 #endif
+
+#include "shared/Addresses.h"
+extern int msgIdTable[maxNumberOfNodes];

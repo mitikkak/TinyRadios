@@ -9,3 +9,5 @@ static constexpr int sw_serial_rx_pin{7};
 static constexpr int sw_serial_tx_pin{6};
 SoftwareSerial _BLUETOOTH(sw_serial_rx_pin, sw_serial_tx_pin);
 #endif
+
+extern int msgIdTable[maxNumberOfNodes]{};

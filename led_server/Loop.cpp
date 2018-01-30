@@ -3,12 +3,10 @@
 #include "Components.h"
 #include "shared/Messages.h"
 #include "Loop.h"
-#include "shared/Addresses.h"
 
 TIME prevLog = 0;
 int transactionId = 0;
 //int node = 0;
-int msgIdTable[maxNumberOfNodes] = {LED_ON_REQUEST, LED_ON_REQUEST, LED_ON_REQUEST};
 void orderOneNode(const int node = 0)
 {
     TIME timeSpent = -1;

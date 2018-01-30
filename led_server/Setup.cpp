@@ -2,6 +2,15 @@
 #include "Arduino.h"
 #include "Components.h"
 #include "shared/Addresses.h"
+#include "shared/Messages.h"
+
+void initMsgIdTable()
+{
+    for (int i = 0; i < maxNumberOfNodes; i++)
+    {
+        msgIdTable[i] = LED_OFF_REQUEST;
+    }
+}
 
 void setup()
 {
@@ -16,4 +25,5 @@ void setup()
     radio.setRetries(15, 15); // Max delay between retries & number of retries
     radio.setPALevel(RF24_PA_LOW);
     pinMode(switchPin, OUTPUT);
+    initMsgIdTable();
 }

@@ -20,7 +20,7 @@ void setup() {
   }
   radio.setPALevel(RF24_PA_LOW);
   pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
+  digitalWrite(ledPin, HIGH);
   //pinMode(sendIndicator, OUTPUT);
   //doBlink(3, 300);
   mode.start(RadioMode::listening, millis());
