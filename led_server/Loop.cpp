@@ -36,6 +36,15 @@ public:
 			reached[nodeIdx] = true;
 		}
 	}
+	bool reachable(const int nodeIdx) const
+	{
+		bool retVal{false};
+		if (nodeIdx < maxNumberOfNodes)
+		{
+			retVal = reached[nodeIdx];
+		}
+		return retVal;
+	}
 private:
 	void updateCurrIdx()
 	{
@@ -125,10 +134,17 @@ void loop()
       String resp = "RESP:";
       for (unsigned node = 0; node < maxNumberOfNodes; node++)
       {
-        char cnt_str_buffer[10] = {0};
-        itoa(node, cnt_str_buffer, 10);
-        resp += cnt_str_buffer;
-        resp += ";";
+    	  if (nodes.reachable(node))
+    	  {
+			  char cnt_str_buffer[10] = {0};
+			  itoa(node, cnt_str_buffer, 10);
+			  resp += cnt_str_buffer;
+    	  }
+    	  else
+    	  {
+    		  resp += "N/A";
+    	  }
+    	  resp += ";";
       }
       _BLUETOOTH.print(resp + "#");
   }
