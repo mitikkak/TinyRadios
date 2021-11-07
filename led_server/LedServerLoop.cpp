@@ -53,5 +53,7 @@ bool onePingRound(RadioMode& mode, unsigned int const receiver, unsigned int con
     radio.closeReadingPipe(pipe);
     timeSpent = millis() - startTime;
     respTrId = resp.header.transactionId;
+    _SERIAL.print("resp: ");_SERIAL.print(resp.header.msgId);
+    _SERIAL.print("timeSpent: ");_SERIAL.print(timeSpent);
     return (resp.header.msgId == PING_RESPONSE) /*&& (resp.header.transactionId == transactionId)*/;
 }

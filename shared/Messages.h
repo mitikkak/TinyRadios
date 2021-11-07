@@ -89,9 +89,9 @@ struct SwitchRequest
     SwitchRequest(const int msgId): header(msgId,0), state(SWITCH_OFF) {}
     Header header;
     SwitchState state;
-    void set(const int s)
+    void set(const SwitchState s)
     {
-       state = (s == 0) ? SWITCH_ON : SWITCH_OFF;
+       state = s;
     }
 };
 struct Response

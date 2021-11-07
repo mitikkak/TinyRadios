@@ -8,7 +8,7 @@ void initMsgIdTable()
 {
     for (int i = 0; i < maxNumberOfNodes; i++)
     {
-        msgIdTable[i] = LED_OFF_REQUEST;
+        msgIdTable[i] = LED_ON_REQUEST;
     }
 }
 
